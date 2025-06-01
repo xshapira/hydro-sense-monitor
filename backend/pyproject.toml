@@ -1,0 +1,67 @@
+[project]
+name = "hydro-sense-monitor-backend"
+version = "0"
+description = "HydroSense Monitor Backend API"
+requires-python = "==3.13.*"
+dependencies = [
+  "fastapi>=0.115.12",
+  "uvicorn[standard]>=0.34.3",
+  "pydantic>=2.11.5",
+  "httpx>=0.28.1",
+  "pydantic-settings>=2.9.1",
+]
+
+[tool.uv]
+dev-dependencies = [
+  "ruff>=0.11.12",
+  "pyrefly>=0.17.1",
+  "pytest>=8.3.5",
+  "pytest-asyncio>=1.0.0",
+]
+
+[tool.pyrefly]
+project_excludes = ["**/__pycache__/**", "**/.[!/.]*", "**/tests"]
+search_path = ["backend"]
+site_package_path = [".venv/lib/python3.13/site-packages"]
+ignore_errors_in_generated_code = true
+use_untyped_imports = true
+ignore_missing_source = true
+
+[tool.pyrefly.errors]
+bad-assignment = true
+invalid-argument = true
+bad-argument-type = false
+
+[tool.ruff]
+line-length = 88
+exclude = ['.git', '__pycache__', '__init__.py', '.mypy_cache', '.pytest_cache']
+extend-include = ["*.ipynb"]
+
+[tool.ruff.lint]
+select = [
+  "E",  # pycodestyle errors
+  "W",  # pycodestyle warnings
+  "F",  # pyflakes
+  "I",  # isort
+  "C4", # flake8-comprehensions
+  "B",  # flake8-bugbear
+  "UP", # pyupgrade
+]
+ignore = [
+  "E501", # line too long
+  "C901", # Comprehension is too complex (11 > 10)
+  "W191", # indentation contains tabs
+]
+unfixable = ["F841"]
+
+
+[tool.ruff.lint.pyupgrade]
+# Preserve types, even if a file imports `from __future__ import annotations`.
+keep-runtime-typing = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+asyncio_mode = "auto"
