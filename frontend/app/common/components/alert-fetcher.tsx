@@ -90,7 +90,7 @@ export function AlertFetcher() {
 						placeholder="Enter unit ID (e.g., unit-123)"
 						value={unitId}
 						onChange={(e) => setUnitId(e.target.value)}
-						className="flex-1"
+						className="flex-1 text-gray-900"
 					/>
 					<Button onClick={fetchAlerts} disabled={loading}>
 						{loading ? "Loading..." : "Fetch Alerts"}
@@ -108,20 +108,30 @@ export function AlertFetcher() {
 						<Table>
 							<TableHeader>
 								<TableRow>
-									<TableHead>Timestamp</TableHead>
-									<TableHead>pH</TableHead>
-									<TableHead>Temperature (°C)</TableHead>
-									<TableHead>EC (mS/cm)</TableHead>
-									<TableHead>Status</TableHead>
+									<TableHead className="text-gray-700">Timestamp</TableHead>
+									<TableHead className="text-gray-700">pH</TableHead>
+									<TableHead className="text-gray-700">
+										Temperature (°C)
+									</TableHead>
+									<TableHead className="text-gray-700">EC (mS/cm)</TableHead>
+									<TableHead className="text-gray-700">Status</TableHead>
 								</TableRow>
 							</TableHeader>
 							<TableBody>
 								{alerts.map((alert) => (
 									<TableRow key={alert.id}>
-										<TableCell>{formatTimestamp(alert.timestamp)}</TableCell>
-										<TableCell>{alert.readings.pH}</TableCell>
-										<TableCell>{alert.readings.temp}</TableCell>
-										<TableCell>{alert.readings.ec}</TableCell>
+										<TableCell className="text-gray-900">
+											{formatTimestamp(alert.timestamp)}
+										</TableCell>
+										<TableCell className="text-gray-900">
+											{alert.readings.pH}
+										</TableCell>
+										<TableCell className="text-gray-900">
+											{alert.readings.temp}
+										</TableCell>
+										<TableCell className="text-gray-900">
+											{alert.readings.ec}
+										</TableCell>
 										<TableCell>
 											<span
 												className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
