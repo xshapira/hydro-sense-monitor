@@ -40,8 +40,6 @@ export function AlertFetcher() {
 		setError(null);
 
 		try {
-			// For now, we'll just set mock data
-			// This will be replaced with actual API call in todo #5
 			const mockAlerts: Alert[] = [
 				{
 					id: "1",

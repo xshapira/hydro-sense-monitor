@@ -1,4 +1,5 @@
 import { AlertFetcher } from "../common/components/alert-fetcher";
+import { RandomReadingGenerator } from "../common/components/random-reading-generator";
 import type { Route } from "./+types/home";
 
 export function meta(_: Route.MetaArgs) {
@@ -46,10 +47,8 @@ export default function Home() {
 							{/* Alert Fetching Component */}
 							<AlertFetcher />
 
-							{/* Random Reading Generator placeholder */}
-							<div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center text-gray-500">
-								Random Reading Generator will be added here
-							</div>
+							{/* Random Reading Generator */}
+							<RandomReadingGenerator />
 						</div>
 					</section>
 				</div>
