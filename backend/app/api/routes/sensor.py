@@ -101,8 +101,14 @@ def classify_reading(readings: dict[str, float]) -> str:
             "description": "Sensor data received and classified",
             "model": ClassificationStatus,
         },
+        400: {
+            "description": "Invalid timestamp (e.g., future date)",
+        },
         422: {
-            "description": "Validation error in request body",
+            "description": "Invalid sensor readings (e.g., pH outside 0-14 range, negative EC, extreme temperatures)",
+        },
+        500: {
+            "description": "Unexpected server error",
         },
     },
 )
@@ -123,7 +129,9 @@ async def submit_sensor_reading(sensor_data: SensorDataInput) -> ClassificationS
         ClassificationStatus with status="OK" and classification result.
 
     Raises:
-        HTTPException: 422 for validation errors, 500 for unexpected errors.
+        InvalidTimestampError: 400 for future timestamps indicating clock sync issues.
+        InvalidSensorReadingsError: 422 for sensor readings outside physical limits.
+        HTTPException: 500 for unexpected errors.
     """
     try:
         validate_timestamp(sensor_data.timestamp)
