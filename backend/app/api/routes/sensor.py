@@ -35,7 +35,8 @@ def validate_timestamp(timestamp: datetime) -> None:
     now = datetime.now(israel_tz)
     if timestamp > now:
         raise InvalidTimestampError(
-            timestamp.isoformat(), "Timestamp cannot be in the future"
+            timestamp.isoformat(),
+            f"Timestamp cannot be in the future (current time in Israel: {now.isoformat()})",
         )
 
 
@@ -155,6 +156,16 @@ async def submit_sensor_reading(sensor_data: SensorDataInput) -> ClassificationS
 
         return ClassificationStatus(status="OK", classification=classification)
 
+    except InvalidTimestampError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+    except InvalidSensorReadingsError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=str(exc),
+        ) from exc
     except Exception as exc:
         # Generic catch-all because sensor data is critical - we'd rather return
         # 500 error than silently fail and leave growers without feedback
