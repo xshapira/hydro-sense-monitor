@@ -1,5 +1,8 @@
+import { useState } from "react";
 import { AlertFetcher } from "../common/components/alert-fetcher";
+import { Button } from "../common/components/button";
 import { RandomReadingGenerator } from "../common/components/random-reading-generator";
+import { UnitsHealthDashboard } from "../common/components/units-health-dashboard";
 import type { Route } from "./+types/home";
 
 export function meta(_: Route.MetaArgs) {
@@ -13,6 +16,8 @@ export function meta(_: Route.MetaArgs) {
 }
 
 export default function Home() {
+	const [showUnitsModal, setShowUnitsModal] = useState(false);
+
 	return (
 		<div className="min-h-screen bg-gray-100">
 			{/* Header */}
@@ -29,6 +34,21 @@ export default function Home() {
 			{/* Main Content */}
 			<main className="max-w-3xl mx-auto px-4 pt-20 pb-12">
 				<div className="space-y-6">
+					{/* Units Overview Button */}
+					<div className="bg-white rounded-xl shadow-md p-6">
+						<h2 className="text-xl font-semibold text-gray-900 mb-4">
+							Units Overview
+						</h2>
+						<p className="text-gray-600 text-sm mb-4">
+							View the health status of all your hydroponic units at a glance
+						</p>
+						<Button
+							onClick={() => setShowUnitsModal(true)}
+							className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium"
+						>
+							View All Units
+						</Button>
+					</div>
 					{/* Alert Fetching Component */}
 					<div className="bg-white rounded-xl shadow-md p-6">
 						<h2 className="text-xl font-semibold text-gray-900 mb-6">
@@ -46,6 +66,16 @@ export default function Home() {
 					</div>
 				</div>
 			</main>
+
+			{/* Units Health Dashboard Modal */}
+			{showUnitsModal && (
+				<UnitsHealthDashboard
+					onClose={() => setShowUnitsModal(false)}
+					onUnitClick={(unitId) => {
+						setShowUnitsModal(false);
+					}}
+				/>
+			)}
 		</div>
 	);
 }
