@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Any
 from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, HTTPException, status
@@ -15,8 +14,8 @@ from app.schemas import (
 router = APIRouter()
 
 # In-memory storage for sensor readings
-# Structure: {unit_id: [list of readings]}
-SENSOR_READINGS_STORE: dict[str, list[dict[str, Any]]] = {}
+# Structure: {unit_id: [list of SensorDataRecord]}
+SENSOR_READINGS_STORE: dict[str, list[SensorDataRecord]] = {}
 
 
 def validate_timestamp(timestamp: datetime) -> None:
@@ -145,11 +144,12 @@ async def submit_sensor_reading(sensor_data: SensorDataInput) -> ClassificationS
         validate_sensor_readings(readings_data)
         classification = classify_reading(readings_data)
 
-        reading_entry = {
-            "timestamp": sensor_data.timestamp,
-            "readings": readings_data,
-            "classification": classification,
-        }  # Store reading in memory
+        reading_entry = SensorDataRecord(
+            unitId=sensor_data.unit_id,
+            timestamp=sensor_data.timestamp,
+            readings=sensor_data.readings,
+            classification=classification,
+        )  # Store reading in memory
 
         SENSOR_READINGS_STORE.setdefault(sensor_data.unit_id, []).append(reading_entry)
 
@@ -216,14 +216,9 @@ async def get_unit_alerts(unit_id: str | None = None) -> AlertsResponse:
     unit_readings = SENSOR_READINGS_STORE.get(unit_id, [])
 
     alerts = [
-        SensorDataRecord(
-            unitId=unit_id,
-            timestamp=reading["timestamp"],
-            readings=reading["readings"],
-            classification=reading["classification"],
-        )
+        reading
         for reading in unit_readings
-        if reading["classification"] == "Needs Attention"
+        if reading.classification == "Needs Attention"
     ]
 
     # Most recent alerts are most actionable - growers need to know
