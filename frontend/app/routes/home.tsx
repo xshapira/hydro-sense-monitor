@@ -52,9 +52,13 @@ export default function Home() {
 					</div>
 					{/* Alert Fetching Component */}
 					<div className="bg-white rounded-xl shadow-md p-6">
-						<h2 className="text-xl font-semibold text-gray-900 mb-6">
+						<h2 className="text-xl font-semibold text-gray-900 mb-4">
 							Fetch Unit Alerts
 						</h2>
+						<p className="text-gray-600 text-sm mb-4">
+							View recent alerts and sensor readings that need attention for a
+							specific unit
+						</p>
 						<AlertFetcher prefilledUnitId={selectedUnitId} />
 					</div>
 
