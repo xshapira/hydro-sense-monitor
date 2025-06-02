@@ -54,7 +54,14 @@ export function AlertFetcher() {
 					id: "2",
 					unit_id: unitId,
 					timestamp: new Date(Date.now() - 600000).toISOString(),
-					readings: { pH: 8.2, temp: 22.5, ec: 1.3 },
+					readings: { pH: 6.2, temp: 22.5, ec: 1.3 },
+					classification: "Healthy",
+				},
+				{
+					id: "3",
+					unit_id: unitId,
+					timestamp: new Date(Date.now() - 1200000).toISOString(),
+					readings: { pH: 8.2, temp: 24.5, ec: 1.5 },
 					classification: "Needs Attention",
 				},
 			];
@@ -116,7 +123,13 @@ export function AlertFetcher() {
 										<TableCell>{alert.readings.temp}</TableCell>
 										<TableCell>{alert.readings.ec}</TableCell>
 										<TableCell>
-											<span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+											<span
+												className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+													alert.classification === "Healthy"
+														? "bg-green-100 text-green-800"
+														: "bg-red-100 text-red-800"
+												}`}
+											>
 												{alert.classification}
 											</span>
 										</TableCell>
