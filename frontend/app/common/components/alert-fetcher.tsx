@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../../lib/api";
 import type { Alert } from "../../lib/api";
 import { Button } from "./button";
@@ -12,12 +12,23 @@ import {
 	TableRow,
 } from "./table";
 
-export function AlertFetcher() {
+interface AlertFetcherProps {
+	prefilledUnitId?: string;
+}
+
+export function AlertFetcher({ prefilledUnitId }: AlertFetcherProps) {
 	const [unitId, setUnitId] = useState("");
 	const [alerts, setAlerts] = useState<Alert[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [hasSearched, setHasSearched] = useState(false);
+
+	// Update unitId when prefilledUnitId changes
+	useEffect(() => {
+		if (prefilledUnitId) {
+			setUnitId(prefilledUnitId);
+		}
+	}, [prefilledUnitId]);
 
 	const fetchAlerts = async () => {
 		if (!unitId.trim()) {

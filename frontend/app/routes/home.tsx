@@ -17,6 +17,7 @@ export function meta(_: Route.MetaArgs) {
 
 export default function Home() {
 	const [showUnitsModal, setShowUnitsModal] = useState(false);
+	const [selectedUnitId, setSelectedUnitId] = useState<string>("");
 
 	return (
 		<div className="min-h-screen bg-gray-100">
@@ -54,7 +55,7 @@ export default function Home() {
 						<h2 className="text-xl font-semibold text-gray-900 mb-6">
 							Fetch Unit Alerts
 						</h2>
-						<AlertFetcher />
+						<AlertFetcher prefilledUnitId={selectedUnitId} />
 					</div>
 
 					{/* Random Reading Generator */}
@@ -72,6 +73,7 @@ export default function Home() {
 				<UnitsHealthDashboard
 					onClose={() => setShowUnitsModal(false)}
 					onUnitClick={(unitId) => {
+						setSelectedUnitId(unitId);
 						setShowUnitsModal(false);
 					}}
 				/>
