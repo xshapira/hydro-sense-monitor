@@ -3,7 +3,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, status
 from pydantic import ValidationError
 
-from app.models import (
+from app.schemas import (
     AlertsResponse,
     ClassificationStatus,
     SensorDataInput,
