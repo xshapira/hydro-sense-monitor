@@ -81,7 +81,7 @@ async def submit_sensor_reading(sensor_data: SensorDataInput) -> ClassificationS
             "classification": classification,
         }  # Store reading in memory
 
-        SENSOR_READINGS_STORE.setdefault(sensor_data.unitId, []).append(reading_entry)
+        SENSOR_READINGS_STORE.setdefault(sensor_data.unit_id, []).append(reading_entry)
 
         return ClassificationStatus(status="OK", classification=classification)
 

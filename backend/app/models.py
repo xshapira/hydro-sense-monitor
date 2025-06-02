@@ -24,20 +24,24 @@ class SensorDataInput(BaseModel):
     Input model for sensor data submission.
     """
 
-    unitId: Annotated[
+    unit_id: Annotated[
         str,
-        Field(min_length=1, description="Unique identifier for the hydroponic unit"),
+        Field(
+            min_length=1,
+            description="Unique identifier for the hydroponic unit",
+            alias="unitId",
+        ),
     ]
     timestamp: Annotated[
         datetime, Field(description="ISO 8601 timestamp of the reading")
     ]
     readings: SensorReadings
 
-    @field_validator("unitId")
+    @field_validator("unit_id")
     @classmethod
     def validate_unit_id(cls, v: str) -> str:
         if not v.strip():
-            raise ValueError("unitId cannot be empty or whitespace")
+            raise ValueError("unit_id cannot be empty or whitespace")
         return v.strip()
 
 
@@ -57,7 +61,7 @@ class SensorDataRecord(BaseModel):
     Complete sensor data record with classification.
     """
 
-    unitId: str
+    unit_id: str = Field(..., alias="unitId")
     timestamp: datetime
     readings: SensorReadings
     classification: str
@@ -70,5 +74,5 @@ class AlertsResponse(BaseModel):
     Response model for alerts endpoint.
     """
 
-    unitId: str
+    unit_id: str = Field(..., alias="unitId")
     alerts: list[SensorDataRecord]
