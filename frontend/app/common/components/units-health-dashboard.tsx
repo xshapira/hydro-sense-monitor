@@ -191,7 +191,7 @@ export function UnitsHealthDashboard({
 				<div className="p-4 border-t border-gray-200 bg-gray-50">
 					<Button
 						onClick={fetchUnits}
-						className="w-full h-10 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium"
+						className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white text-base font-medium cursor-pointer transition-colors duration-200 ease-in-out"
 					>
 						Refresh Units
 					</Button>

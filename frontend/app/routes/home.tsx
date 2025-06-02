@@ -45,7 +45,7 @@ export default function Home() {
 						</p>
 						<Button
 							onClick={() => setShowUnitsModal(true)}
-							className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white text-base font-medium"
+							className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white text-base font-medium cursor-pointer transition-colors duration-200 ease-in-out"
 						>
 							View All Units
 						</Button>
