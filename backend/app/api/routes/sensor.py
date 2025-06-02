@@ -1,9 +1,15 @@
+from typing import Any
+
 from fastapi import APIRouter, HTTPException, status
 from pydantic import ValidationError
 
 from app.models import ClassificationStatus, SensorDataInput
 
 router = APIRouter()
+
+# In-memory storage for sensor readings
+# Structure: {unit_id: [list of readings]}
+SENSOR_READINGS_STORE: dict[str, list[dict[str, Any]]] = {}
 
 
 def classify_reading(readings: dict[str, float]) -> str:
@@ -68,6 +74,14 @@ async def submit_sensor_reading(sensor_data: SensorDataInput) -> ClassificationS
         }
 
         classification = classify_reading(readings_data)
+
+        reading_entry = {
+            "timestamp": sensor_data.timestamp,
+            "readings": readings_data,
+            "classification": classification,
+        }  # Store reading in memory
+
+        SENSOR_READINGS_STORE.setdefault(sensor_data.unitId, []).append(reading_entry)
 
         return ClassificationStatus(status="OK", classification=classification)
 
