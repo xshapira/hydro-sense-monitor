@@ -60,68 +60,59 @@ export function RandomReadingGenerator() {
 	};
 
 	return (
-		<div className="space-y-4">
+		<div className="space-y-8">
 			<div>
-				<h3 className="text-base font-medium text-gray-900 mb-3">
-					Generate Random Sensor Reading
-				</h3>
-				<p className="text-sm text-gray-600 mb-4">
-					Generate and send a random sensor reading to test the classification
-					system.
-				</p>
-
-				<Button onClick={sendRandomReading} disabled={loading}>
+				<Button
+					onClick={sendRandomReading}
+					disabled={loading}
+					className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white text-base font-medium cursor-pointer transition-colors duration-200 ease-in-out"
+				>
 					{loading ? "Sending..." : "Generate Random Reading"}
 				</Button>
-
 				{error && <p className="text-sm text-red-600 mt-2">{error}</p>}
 			</div>
 
 			{lastReading && classification && (
-				<div className="mt-4 space-y-3">
-					<div className="bg-gray-50 rounded-lg p-4">
-						<h4 className="text-sm font-medium text-gray-700 mb-2">
-							Generated Reading:
+				<div className="space-y-6 mt-6">
+					<div>
+						<h4 className="text-base font-medium text-gray-700 mb-4">
+							Generated Reading
 						</h4>
-						<div className="grid grid-cols-3 gap-4 text-sm">
-							<div>
-								<span className="text-gray-500">pH:</span>{" "}
-								<span className="font-medium text-gray-900">
+						<div className="space-y-3">
+							<div className="flex justify-between items-center">
+								<span className="text-gray-600 text-sm">pH</span>
+								<span className="font-medium text-gray-900 text-sm">
 									{lastReading.pH}
 								</span>
 							</div>
-							<div>
-								<span className="text-gray-500">Temp:</span>{" "}
-								<span className="font-medium text-gray-900">
+							<div className="flex justify-between items-center">
+								<span className="text-gray-600 text-sm">Temp</span>
+								<span className="font-medium text-gray-900 text-sm">
 									{lastReading.temp}°C
 								</span>
 							</div>
-							<div>
-								<span className="text-gray-500">EC:</span>{" "}
-								<span className="font-medium text-gray-900">
+							<div className="flex justify-between items-center">
+								<span className="text-gray-600 text-sm">EC</span>
+								<span className="font-medium text-gray-900 text-sm">
 									{lastReading.ec} mS/cm
 								</span>
 							</div>
 						</div>
 					</div>
 
-					<div className="bg-gray-50 rounded-lg p-4">
-						<h4 className="text-sm font-medium text-gray-700 mb-2">
-							Classification Result:
+					<div>
+						<h4 className="text-base font-medium text-gray-700 mb-3">
+							Classification Result
 						</h4>
-						<div className="flex items-center gap-2">
-							<span className="text-sm text-gray-500">Status:</span>
-							<span className="text-sm font-medium text-gray-900">
-								{classification.status}
+						<div className="flex justify-between items-center">
+							<span className="text-gray-600 text-sm">
+								Status: {classification.status}
 							</span>
-						</div>
-						<div className="flex items-center gap-2 mt-1">
-							<span className="text-sm text-gray-500">Classification:</span>
 							<span
-								className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+								className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
 									classification.classification === "Healthy"
-										? "bg-green-100 text-green-800"
-										: "bg-red-100 text-red-800"
+										? "bg-green-100 text-green-700"
+										: "bg-red-100 text-red-700"
 								}`}
 							>
 								{classification.classification}

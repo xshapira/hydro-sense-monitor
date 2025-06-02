@@ -77,20 +77,21 @@ export function AlertFetcher() {
 	};
 
 	return (
-		<div className="space-y-4">
+		<div className="space-y-6">
 			<div>
-				<h3 className="text-base font-medium text-gray-900 mb-3">
-					Fetch Alerts by Unit ID
-				</h3>
-				<div className="flex gap-2">
+				<div className="flex flex-col gap-4">
 					<Input
 						type="text"
-						placeholder="Enter unit ID (e.g., unit-123)"
+						placeholder="Unit ID"
 						value={unitId}
 						onChange={(e) => setUnitId(e.target.value)}
-						className="flex-1 text-gray-900"
+						className="w-full h-12 text-base text-gray-900 placeholder:text-gray-500"
 					/>
-					<Button onClick={fetchAlerts} disabled={loading}>
+					<Button
+						onClick={fetchAlerts}
+						disabled={loading}
+						className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white text-base font-medium cursor-pointer transition-colors duration-200 ease-in-out"
+					>
 						{loading ? "Loading..." : "Fetch Alerts"}
 					</Button>
 				</div>
@@ -98,53 +99,63 @@ export function AlertFetcher() {
 			</div>
 
 			{alerts.length > 0 && (
-				<div>
-					<h4 className="text-sm font-medium text-gray-700 mb-2">
+				<div className="mt-6">
+					<h4 className="text-base font-medium text-gray-700 mb-3">
 						Recent Alerts for {unitId}
 					</h4>
-					<div className="border rounded-lg overflow-hidden">
-						<Table>
-							<TableHeader>
-								<TableRow>
-									<TableHead className="text-gray-700">Timestamp</TableHead>
-									<TableHead className="text-gray-700">pH</TableHead>
-									<TableHead className="text-gray-700">
-										Temperature (°C)
-									</TableHead>
-									<TableHead className="text-gray-700">EC (mS/cm)</TableHead>
-									<TableHead className="text-gray-700">Status</TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{alerts.map((alert) => (
-									<TableRow key={alert.id}>
-										<TableCell className="text-gray-900">
-											{formatTimestamp(alert.timestamp)}
-										</TableCell>
-										<TableCell className="text-gray-900">
-											{alert.readings.pH}
-										</TableCell>
-										<TableCell className="text-gray-900">
-											{alert.readings.temp}
-										</TableCell>
-										<TableCell className="text-gray-900">
-											{alert.readings.ec}
-										</TableCell>
-										<TableCell>
-											<span
-												className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-													alert.classification === "Healthy"
-														? "bg-green-100 text-green-800"
-														: "bg-red-100 text-red-800"
-												}`}
-											>
-												{alert.classification}
-											</span>
-										</TableCell>
+					<div className="border border-gray-200 rounded-lg overflow-hidden">
+						<div className="overflow-x-auto">
+							<Table>
+								<TableHeader>
+									<TableRow>
+										<TableHead className="text-sm whitespace-nowrap text-gray-700 font-medium">
+											Timestamp
+										</TableHead>
+										<TableHead className="text-sm text-gray-700 font-medium">
+											pH
+										</TableHead>
+										<TableHead className="text-sm text-gray-700 font-medium">
+											Temperature (°C)
+										</TableHead>
+										<TableHead className="text-sm text-gray-700 font-medium">
+											EC (mS/cm)
+										</TableHead>
+										<TableHead className="text-sm text-gray-700 font-medium">
+											Status
+										</TableHead>
 									</TableRow>
-								))}
-							</TableBody>
-						</Table>
+								</TableHeader>
+								<TableBody>
+									{alerts.map((alert) => (
+										<TableRow key={alert.id}>
+											<TableCell className="text-sm text-gray-900">
+												{formatTimestamp(alert.timestamp)}
+											</TableCell>
+											<TableCell className="text-sm text-gray-900">
+												{alert.readings.pH}
+											</TableCell>
+											<TableCell className="text-sm text-gray-900">
+												{alert.readings.temp}
+											</TableCell>
+											<TableCell className="text-sm text-gray-900">
+												{alert.readings.ec}
+											</TableCell>
+											<TableCell>
+												<span
+													className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+														alert.classification === "Healthy"
+															? "bg-green-100 text-green-800"
+															: "bg-red-100 text-red-800"
+													}`}
+												>
+													{alert.classification}
+												</span>
+											</TableCell>
+										</TableRow>
+									))}
+								</TableBody>
+							</Table>
+						</div>
 					</div>
 				</div>
 			)}

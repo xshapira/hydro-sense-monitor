@@ -14,43 +14,36 @@ export function meta(_: Route.MetaArgs) {
 
 export default function Home() {
 	return (
-		<div className="min-h-screen bg-gray-50">
+		<div className="min-h-screen bg-gray-100">
 			{/* Header */}
-			<header className="bg-white shadow-sm border-b border-gray-200">
+			<header className="bg-white shadow-sm">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-					<div className="flex items-center justify-between h-16">
-						<h1 className="text-2xl font-semibold text-gray-900">
+					<div className="flex items-center justify-center h-20">
+						<h1 className="text-3xl font-semibold text-gray-900">
 							HydroSense Monitor
 						</h1>
-						<div className="text-sm text-gray-500">
-							Monitoring hydroponic pods
-						</div>
 					</div>
 				</div>
 			</header>
 
 			{/* Main Content */}
-			<main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-				<div className="space-y-8">
-					{/* Dashboard Section */}
-					<section className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-						<h2 className="text-lg font-medium text-gray-900 mb-4">
-							Sensor Dashboard
+			<main className="max-w-3xl mx-auto px-4 py-12">
+				<div className="space-y-6">
+					{/* Alert Fetching Component */}
+					<div className="bg-white rounded-xl shadow-md p-6">
+						<h2 className="text-xl font-semibold text-gray-900 mb-6">
+							Fetch Unit Alerts
 						</h2>
-						<p className="text-gray-600">
-							Monitor pH, temperature, and conductivity readings from your
-							hydroponic units.
-						</p>
+						<AlertFetcher />
+					</div>
 
-						{/* Components will be added here */}
-						<div className="mt-6 space-y-6">
-							{/* Alert Fetching Component */}
-							<AlertFetcher />
-
-							{/* Random Reading Generator */}
-							<RandomReadingGenerator />
-						</div>
-					</section>
+					{/* Random Reading Generator */}
+					<div className="bg-white rounded-xl shadow-md p-6">
+						<h2 className="text-xl font-semibold text-gray-900 mb-6">
+							Test Sensor Classification
+						</h2>
+						<RandomReadingGenerator />
+					</div>
 				</div>
 			</main>
 		</div>
