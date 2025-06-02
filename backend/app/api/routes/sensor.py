@@ -1,9 +1,11 @@
+from datetime import datetime
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, HTTPException, status
 from pydantic import ValidationError
 
-from app.exceptions import InvalidSensorReadingsError
+from app.exceptions import InvalidSensorReadingsError, InvalidTimestampError
 from app.schemas import (
     AlertsResponse,
     ClassificationStatus,
@@ -16,6 +18,27 @@ router = APIRouter()
 # In-memory storage for sensor readings
 # Structure: {unit_id: [list of readings]}
 SENSOR_READINGS_STORE: dict[str, list[dict[str, Any]]] = {}
+
+
+def validate_timestamp(timestamp: datetime) -> None:
+    """
+    Validate timestamp is not in the future.
+
+    Future timestamps indicate clock sync issues on sensor devices
+    and can corrupt trend analysis by appearing out of sequence.
+
+    Args:
+        timestamp: The datetime to validate.
+
+    Raises:
+        InvalidTimestampError: When timestamp is in the future.
+    """
+    israel_tz = ZoneInfo("Asia/Jerusalem")
+    now = datetime.now(israel_tz)
+    if timestamp > now:
+        raise InvalidTimestampError(
+            timestamp.isoformat(), "Timestamp cannot be in the future"
+        )
 
 
 def validate_sensor_readings(readings: dict[str, float]) -> None:
@@ -104,6 +127,8 @@ async def submit_sensor_reading(sensor_data: SensorDataInput) -> ClassificationS
         HTTPException: 422 for validation errors, 500 for unexpected errors.
     """
     try:
+        validate_timestamp(sensor_data.timestamp)
+
         readings_data = {
             "pH": sensor_data.readings.pH,
             "temp": sensor_data.readings.temp,
