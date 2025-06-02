@@ -3,6 +3,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, status
 from pydantic import ValidationError
 
+from app.exceptions import InvalidSensorReadingsError
 from app.schemas import (
     AlertsResponse,
     ClassificationStatus,
@@ -15,6 +16,37 @@ router = APIRouter()
 # In-memory storage for sensor readings
 # Structure: {unit_id: [list of readings]}
 SENSOR_READINGS_STORE: dict[str, list[dict[str, Any]]] = {}
+
+
+def validate_sensor_readings(readings: dict[str, float]) -> None:
+    """
+    Validate sensor readings are within physical limits.
+
+    Catches malfunctioning sensors reporting impossible values before they
+    corrupt our data analysis and classification.
+
+    Args:
+        readings: Dictionary containing sensor readings with keys 'pH', 'temp', and 'ec'.
+
+    Raises:
+        InvalidSensorReadingsError: When any reading is outside physical limits.
+    """
+    ph_value = readings["pH"]
+    temp_value = readings["temp"]
+    ec_value = readings["ec"]
+
+    if not (0 <= ph_value <= 14):
+        raise InvalidSensorReadingsError(
+            f"pH value {ph_value} is outside valid range (0-14)"
+        )
+
+    if not (-10 <= temp_value <= 60):
+        raise InvalidSensorReadingsError(
+            f"Temperature {temp_value}°C is outside valid range (-10 to 60°C)"
+        )
+
+    if ec_value < 0:
+        raise InvalidSensorReadingsError(f"EC value {ec_value} cannot be negative")
 
 
 def classify_reading(readings: dict[str, float]) -> str:
@@ -78,6 +110,7 @@ async def submit_sensor_reading(sensor_data: SensorDataInput) -> ClassificationS
             "ec": sensor_data.readings.ec,
         }
 
+        validate_sensor_readings(readings_data)
         classification = classify_reading(readings_data)
 
         reading_entry = {
