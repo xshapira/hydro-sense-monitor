@@ -76,3 +76,34 @@ class AlertsResponse(BaseModel):
 
     unit_id: str = Field(..., alias="unitId")
     alerts: list[SensorDataRecord]
+
+
+class UnitStatus(BaseModel):
+    """
+    Status information for a single hydroponic unit.
+    """
+
+    unit_id: str = Field(..., alias="unitId")
+    last_reading: SensorDataRecord | None = Field(
+        None, alias="lastReading", description="Most recent sensor reading"
+    )
+    total_readings: int = Field(
+        ..., alias="totalReadings", description="Total number of readings for this unit"
+    )
+    alerts_count: int = Field(
+        ..., alias="alertsCount", description="Number of 'Needs Attention' readings"
+    )
+    health_status: str = Field(
+        ...,
+        alias="healthStatus",
+        description="Overall health: 'healthy', 'warning', or 'critical'",
+    )
+
+
+class UnitsResponse(BaseModel):
+    """
+    Response model for units overview endpoint.
+    """
+
+    units: list[UnitStatus]
+    total_units: int = Field(..., alias="totalUnits")

@@ -9,6 +9,8 @@ from app.schemas import (
     ClassificationStatus,
     SensorDataInput,
     SensorDataRecord,
+    UnitsResponse,
+    UnitStatus,
 )
 
 router = APIRouter()
@@ -244,3 +246,72 @@ async def get_unit_alerts(unit_id: str | None = None) -> AlertsResponse:
     # A 404 would imply something is wrong, but having no alerts means the
     # system is healthy.
     return AlertsResponse(unitId=unit_id, alerts=alerts)
+
+
+@router.get(
+    "/units",
+    response_model=UnitsResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get all units with their health status",
+    description="Retrieve all hydroponic units with their latest readings and health status",
+    responses={
+        200: {
+            "description": "Units retrieved successfully",
+            "model": UnitsResponse,
+        },
+    },
+)
+async def get_all_units() -> UnitsResponse:
+    """
+    Get overview of all hydroponic units with their health status.
+
+    We're showing all units in the system with their current health status. Health status is determined by:
+
+    - 'healthy': No alerts in the last 10 readings
+    - 'warning': 1-3 alerts in the last 10 readings
+    - 'critical': 4+ alerts in the last 10 readings
+
+    This helps growers quickly identify which units need immediate attention
+    without checking each unit individually.
+
+    Returns:
+        UnitsResponse containing all units with their status information.
+    """
+    unit_statuses = []
+
+    for unit_id, readings in SENSOR_READINGS_STORE.items():
+        sorted_readings = sorted(
+            readings, key=lambda x: x.timestamp, reverse=True
+        )  # newest first
+
+        last_reading = sorted_readings[0] if sorted_readings else None
+
+        alerts_count = sum(
+            reading.classification == "Needs Attention" for reading in readings
+        )  # total alerts
+
+        recent_readings = sorted_readings[:10]
+        recent_alerts = sum(
+            reading.classification == "Needs Attention" for reading in recent_readings
+        )  # health status based on alerts in last 10 readings
+
+        if recent_alerts == 0:
+            health_status = "healthy"
+        elif recent_alerts <= 3:
+            health_status = "warning"
+        else:
+            health_status = "critical"
+
+        unit_status = UnitStatus(
+            unitId=unit_id,
+            lastReading=last_reading,
+            totalReadings=len(readings),
+            alertsCount=alerts_count,
+            healthStatus=health_status,
+        )
+        unit_statuses.append(unit_status)
+
+    status_order = {"critical": 0, "warning": 1, "healthy": 2}
+    unit_statuses.sort(key=lambda x: (status_order[x.health_status], x.unit_id))
+
+    return UnitsResponse(units=unit_statuses, totalUnits=len(unit_statuses))
