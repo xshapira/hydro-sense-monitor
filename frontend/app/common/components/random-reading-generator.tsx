@@ -1,21 +1,12 @@
 import { useState } from "react";
+import { api } from "../../lib/api";
+import type { ClassificationStatus, SensorReading } from "../../lib/api";
 import { Button } from "./button";
-
-interface SensorReading {
-	pH: number;
-	temp: number;
-	ec: number;
-}
-
-interface ClassificationResult {
-	status: string;
-	classification: "Healthy" | "Needs Attention";
-}
 
 export function RandomReadingGenerator() {
 	const [lastReading, setLastReading] = useState<SensorReading | null>(null);
 	const [classification, setClassification] =
-		useState<ClassificationResult | null>(null);
+		useState<ClassificationStatus | null>(null);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -40,19 +31,22 @@ export function RandomReadingGenerator() {
 		setLastReading(reading);
 
 		try {
-			// Mock API call - enables UI testing without backend running
-			await new Promise((resolve) => setTimeout(resolve, 500));
+			// Generate a unique unit ID for testing
+			const unitId = `unit-${Math.floor(Math.random() * 1000)}`;
 
-			// pH 5.5-7.0 = optimal nutrient uptake range for most crops
-			const isHealthy = reading.pH >= 5.5 && reading.pH <= 7.0;
-			const mockResponse: ClassificationResult = {
-				status: "OK",
-				classification: isHealthy ? "Healthy" : "Needs Attention",
-			};
+			const response = await api.submitSensorReading({
+				unitId,
+				timestamp: new Date().toISOString(),
+				readings: reading,
+			});
 
-			setClassification(mockResponse);
+			setClassification(response);
 		} catch (err) {
-			setError("Failed to send reading");
+			if (err instanceof Error) {
+				setError(err.message);
+			} else {
+				setError("Failed to send reading");
+			}
 			setClassification(null);
 		} finally {
 			setLoading(false);
