@@ -1,3 +1,4 @@
+import { AlertFetcher } from "../common/components/alert-fetcher";
 import type { Route } from "./+types/home";
 
 export function meta(_: Route.MetaArgs) {
@@ -42,10 +43,8 @@ export default function Home() {
 
 						{/* Components will be added here */}
 						<div className="mt-6 space-y-6">
-							{/* Alert Fetching Component placeholder */}
-							<div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center text-gray-500">
-								Alert Fetching Component will be added here
-							</div>
+							{/* Alert Fetching Component */}
+							<AlertFetcher />
 
 							{/* Random Reading Generator placeholder */}
 							<div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center text-gray-500">
