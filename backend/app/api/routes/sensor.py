@@ -3,7 +3,6 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, HTTPException, status
-from pydantic import ValidationError
 
 from app.exceptions import InvalidSensorReadingsError, InvalidTimestampError
 from app.schemas import (
@@ -148,12 +147,6 @@ async def submit_sensor_reading(sensor_data: SensorDataInput) -> ClassificationS
 
         return ClassificationStatus(status="OK", classification=classification)
 
-    except ValidationError as exc:
-        # In case our models change or FastAPI's behavior changes,
-        # we want explicit handling
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
-        ) from exc
     except Exception as exc:
         # Generic catch-all because sensor data is critical - we'd rather return
         # 500 error than silently fail and leave growers without feedback
