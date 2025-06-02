@@ -1,0 +1,58 @@
+{
+	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"ignoreUnknown": true,
+		"ignore": ["node_modules/**"]
+	},
+	"organizeImports": {
+		"enabled": true
+	},
+	"formatter": {
+		"indentStyle": "space",
+		"indentWidth": 2,
+		"lineWidth": 100,
+		"ignore": ["pnpm-lock.yaml"]
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"recommended": false,
+			"style": {
+				"useNodejsImportProtocol": "error",
+				// Enforce separate type imports for type-only imports to avoid bundling unneeded code
+				"useImportType": "error"
+			},
+			"suspicious": {
+				// This one is specific to catch `console.log`. The rest of logs are permitted
+				"noConsoleLog": "warn"
+			},
+			"correctness": {
+				"noUnusedVariables": "error",
+				"noUnusedFunctionParameters": "error",
+				"noUnusedImports": "error"
+			}
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"trailingCommas": "all",
+			"quoteStyle": "single",
+			"semicolons": "always"
+		}
+	},
+	"json": {
+		"parser": {
+			"allowComments": true,
+			"allowTrailingCommas": true
+		},
+		"formatter": {
+			"indentStyle": "space",
+			"trailingCommas": "none"
+		}
+	}
+}
