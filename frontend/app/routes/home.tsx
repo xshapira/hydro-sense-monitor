@@ -27,7 +27,7 @@ export default function Home() {
 			</header>
 
 			{/* Main Content */}
-			<main className="max-w-3xl mx-auto px-4 py-12">
+			<main className="max-w-3xl mx-auto px-4 pt-20 pb-12">
 				<div className="space-y-6">
 					{/* Alert Fetching Component */}
 					<div className="bg-white rounded-xl shadow-md p-6">
