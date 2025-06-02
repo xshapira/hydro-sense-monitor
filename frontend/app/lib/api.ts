@@ -30,6 +30,19 @@ export interface AlertsResponse {
 	alerts: Alert[];
 }
 
+export interface UnitStatus {
+	unitId: string;
+	lastReading: Alert | null;
+	totalReadings: number;
+	alertsCount: number;
+	healthStatus: "healthy" | "warning" | "critical";
+}
+
+export interface UnitsResponse {
+	units: UnitStatus[];
+	totalUnits: number;
+}
+
 class ApiError extends Error {
 	constructor(
 		public status: number,
@@ -78,6 +91,20 @@ export const api = {
 				response.status,
 				errorData.detail ||
 					`Failed to submit sensor reading: ${response.statusText}`,
+			);
+		}
+
+		return response.json();
+	},
+
+	async fetchUnits(): Promise<UnitsResponse> {
+		const response = await fetch(`${API_BASE_URL}/units`);
+
+		if (!response.ok) {
+			const errorData = await response.json().catch(() => ({}));
+			throw new ApiError(
+				response.status,
+				errorData.detail || `Failed to fetch units: ${response.statusText}`,
 			);
 		}
 
