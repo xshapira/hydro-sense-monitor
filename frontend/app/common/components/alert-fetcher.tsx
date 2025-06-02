@@ -56,6 +56,11 @@ export function AlertFetcher() {
 						placeholder="Unit ID"
 						value={unitId}
 						onChange={(e) => setUnitId(e.target.value)}
+						onKeyDown={(e) => {
+							if (e.key === "Enter" && !loading) {
+								fetchAlerts();
+							}
+						}}
 						className="w-full h-12 text-base text-gray-900 placeholder:text-gray-500"
 					/>
 					<Button
