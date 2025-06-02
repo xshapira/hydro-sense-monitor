@@ -3,7 +3,12 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, status
 from pydantic import ValidationError
 
-from app.models import ClassificationStatus, SensorDataInput
+from app.models import (
+    AlertsResponse,
+    ClassificationStatus,
+    SensorDataInput,
+    SensorDataRecord,
+)
 
 router = APIRouter()
 
@@ -98,3 +103,79 @@ async def submit_sensor_reading(sensor_data: SensorDataInput) -> ClassificationS
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred while processing the sensor data",
         ) from exc
+
+
+@router.get(
+    "/alerts",
+    response_model=AlertsResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Get alerts for a specific unit",
+    description="Retrieve the last 10 sensor readings classified as 'Needs Attention' for a specific unit",
+    responses={
+        200: {
+            "description": "Alerts retrieved successfully",
+            "model": AlertsResponse,
+        },
+        400: {
+            "description": "Invalid unitId parameter",
+        },
+        404: {
+            "description": "No alerts found for the specified unit",
+        },
+    },
+)
+async def get_unit_alerts(unit_id: str | None = None) -> AlertsResponse:
+    """
+    Get alerts for a specific hydroponic unit.
+
+    This endpoint provides critical information for growers by showing recent
+    problematic readings. In hydroponics, pH drift outside the 5.5-7.0 range
+    can quickly damage crops by making nutrients unavailable. By returning the
+    last 10 alerts, growers can:
+
+    1. Identify recurring issues (e.g., consistent pH drift at night)
+    2. Track how quickly problems develop
+    3. Verify if corrective actions worked
+
+    Args:
+        unit_id: Query parameter for the unit to retrieve alerts for.
+
+    Returns:
+        AlertsResponse containing the unit_id and list of alert readings.
+
+    Raises:
+        HTTPException: 400 if unitId is missing/invalid, 404 if no alerts found.
+    """
+    if not unit_id or not unit_id.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="unitId query parameter is required and cannot be empty",
+        )
+
+    unit_id = unit_id.strip()
+
+    unit_readings = SENSOR_READINGS_STORE.get(unit_id, [])
+
+    alerts = [
+        SensorDataRecord(
+            unitId=unit_id,
+            timestamp=reading["timestamp"],
+            readings=reading["readings"],
+            classification=reading["classification"],
+        )
+        for reading in unit_readings
+        if reading["classification"] == "Needs Attention"
+    ]
+
+    # Most recent alerts are most actionable - growers need to know
+    # what's happening NOW
+    alerts.sort(key=lambda x: x.timestamp, reverse=True)
+
+    # Why 10? Hydroponic systems typically cycle nutrients every 2-3 hours.
+    # Ten alerts give growers ~20-30 hours of problem history - enough to spot # patterns without overwhelming them.
+    alerts = alerts[:10]
+
+    # Always return 200 OK even for non-existent units or empty results.
+    # A 404 would imply something is wrong, but having no alerts means the
+    # system is healthy.
+    return AlertsResponse(unitId=unit_id, alerts=alerts)
