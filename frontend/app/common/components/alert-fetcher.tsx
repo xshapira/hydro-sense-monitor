@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { api } from "../../lib/api";
+import type { Alert } from "../../lib/api";
 import { Button } from "./button";
 import { Input } from "./input";
 import {
@@ -9,20 +11,6 @@ import {
 	TableHeader,
 	TableRow,
 } from "./table";
-
-interface SensorReading {
-	pH: number;
-	temp: number;
-	ec: number;
-}
-
-interface Alert {
-	id: string;
-	unit_id: string;
-	timestamp: string;
-	readings: SensorReading;
-	classification: "Healthy" | "Needs Attention";
-}
 
 export function AlertFetcher() {
 	const [unitId, setUnitId] = useState("");
@@ -40,33 +28,14 @@ export function AlertFetcher() {
 		setError(null);
 
 		try {
-			const mockAlerts: Alert[] = [
-				{
-					id: "1",
-					unit_id: unitId,
-					timestamp: new Date().toISOString(),
-					readings: { pH: 7.5, temp: 23.1, ec: 1.4 },
-					classification: "Needs Attention",
-				},
-				{
-					id: "2",
-					unit_id: unitId,
-					timestamp: new Date(Date.now() - 600000).toISOString(),
-					readings: { pH: 6.2, temp: 22.5, ec: 1.3 },
-					classification: "Healthy",
-				},
-				{
-					id: "3",
-					unit_id: unitId,
-					timestamp: new Date(Date.now() - 1200000).toISOString(),
-					readings: { pH: 8.2, temp: 24.5, ec: 1.5 },
-					classification: "Needs Attention",
-				},
-			];
-
-			setAlerts(mockAlerts);
+			const response = await api.fetchAlerts(unitId);
+			setAlerts(response.alerts);
 		} catch (err) {
-			setError("Failed to fetch alerts");
+			if (err instanceof Error) {
+				setError(err.message);
+			} else {
+				setError("Failed to fetch alerts");
+			}
 		} finally {
 			setLoading(false);
 		}
@@ -126,8 +95,10 @@ export function AlertFetcher() {
 									</TableRow>
 								</TableHeader>
 								<TableBody>
-									{alerts.map((alert) => (
-										<TableRow key={alert.id}>
+									{alerts.map((alert, index) => (
+										<TableRow
+											key={`${alert.unitId}-${alert.timestamp}-${index}`}
+										>
 											<TableCell className="text-sm text-gray-900">
 												{formatTimestamp(alert.timestamp)}
 											</TableCell>
