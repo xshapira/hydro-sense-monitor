@@ -14,14 +14,19 @@ export function UnitsHealthDashboard({
 }: UnitsHealthDashboardProps) {
 	const [units, setUnits] = useState<UnitStatus[]>([]);
 	const [loading, setLoading] = useState(true);
+	const [refreshing, setRefreshing] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		fetchUnits();
 	}, []);
 
-	const fetchUnits = async () => {
-		setLoading(true);
+	const fetchUnits = async (isRefresh = false) => {
+		if (isRefresh) {
+			setRefreshing(true);
+		} else {
+			setLoading(true);
+		}
 		setError(null);
 
 		try {
@@ -34,7 +39,11 @@ export function UnitsHealthDashboard({
 				setError("Failed to fetch units");
 			}
 		} finally {
-			setLoading(false);
+			if (isRefresh) {
+				setRefreshing(false);
+			} else {
+				setLoading(false);
+			}
 		}
 	};
 
@@ -63,16 +72,6 @@ export function UnitsHealthDashboard({
 	const formatTimestamp = (timestamp: string) => {
 		return new Date(timestamp).toLocaleString();
 	};
-
-	if (loading) {
-		return (
-			<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-				<div className="bg-white rounded-lg p-8">
-					<p className="text-gray-600">Loading units...</p>
-				</div>
-			</div>
-		);
-	}
 
 	return (
 		<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -110,7 +109,11 @@ export function UnitsHealthDashboard({
 				</div>
 
 				<div className="flex-1 overflow-y-auto p-6">
-					{units.length === 0 ? (
+					{loading ? (
+						<div className="text-center py-12">
+							<p className="text-gray-500">Loading units...</p>
+						</div>
+					) : units.length === 0 ? (
 						<div className="text-center py-12">
 							<p className="text-gray-500">
 								No units found. Start by submitting sensor readings.
@@ -190,10 +193,11 @@ export function UnitsHealthDashboard({
 
 				<div className="p-4 border-t border-gray-200 bg-gray-50">
 					<Button
-						onClick={fetchUnits}
-						className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white text-base font-medium cursor-pointer transition-colors duration-200 ease-in-out"
+						onClick={() => fetchUnits(true)}
+						disabled={refreshing}
+						className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white text-base font-medium cursor-pointer transition-colors duration-200 ease-in-out"
 					>
-						Refresh Units
+						{refreshing ? "Refreshing..." : "Refresh Units"}
 					</Button>
 				</div>
 			</div>
