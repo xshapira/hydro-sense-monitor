@@ -17,6 +17,7 @@ export function AlertFetcher() {
 	const [alerts, setAlerts] = useState<Alert[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [hasSearched, setHasSearched] = useState(false);
 
 	const fetchAlerts = async () => {
 		if (!unitId.trim()) {
@@ -30,6 +31,7 @@ export function AlertFetcher() {
 		try {
 			const response = await api.fetchAlerts(unitId);
 			setAlerts(response.alerts);
+			setHasSearched(true);
 		} catch (err) {
 			if (err instanceof Error) {
 				setError(err.message);
@@ -66,6 +68,15 @@ export function AlertFetcher() {
 				</div>
 				{error && <p className="text-sm text-red-600 mt-2">{error}</p>}
 			</div>
+
+			{hasSearched && alerts.length === 0 && !error && (
+				<div className="mt-6 p-4 bg-red-50 rounded-lg">
+					<p className="text-sm text-red-600 text-center">
+						No alerts found for unit "{unitId}". This unit either has no issues
+						or doesn't exist.
+					</p>
+				</div>
+			)}
 
 			{alerts.length > 0 && (
 				<div className="mt-6">
