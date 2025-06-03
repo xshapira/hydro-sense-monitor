@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { RandomReadingGenerator } from "~/common/components/random-reading-generator";

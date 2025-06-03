@@ -1,3 +1,4 @@
+import { jest } from "@jest/globals";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AlertFetcher } from "~/common/components/alert-fetcher";
