@@ -72,7 +72,7 @@ export function AlertFetcher({ prefilledUnitId }: AlertFetcherProps) {
 								fetchAlerts();
 							}
 						}}
-						className="w-full h-12 text-base text-gray-900 placeholder:text-gray-500"
+						className="w-full h-12 text-base text-gray-900 placeholder:text-gray-500 focus-visible:border-emerald-300 focus-visible:ring-emerald-200"
 					/>
 					<Button
 						onClick={fetchAlerts}
