@@ -1,7 +1,7 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Query, status
 
 from app.exceptions import InvalidSensorReadingsError, InvalidTimestampError
 from app.schemas import (
@@ -196,7 +196,9 @@ async def submit_sensor_reading(sensor_data: SensorDataInput) -> ClassificationS
         },
     },
 )
-async def get_unit_alerts(unit_id: str | None = None) -> AlertsResponse:
+async def get_unit_alerts(
+    unit_id: str | None = Query(None, alias="unitId"),
+) -> AlertsResponse:
     """
     Get alerts for a specific hydroponic unit.
 
