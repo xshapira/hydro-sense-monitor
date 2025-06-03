@@ -4,18 +4,23 @@ import userEvent from "@testing-library/user-event";
 import { AlertFetcher } from "~/common/components/alert-fetcher";
 import { api } from "~/lib/api";
 
-// Mock the API module
-jest.mock("~/lib/api", () => ({
-	api: {
-		fetchAlerts: jest.fn(),
-	},
-}));
+// Manual mocking approach for ESM compatibility
+const mockFetchAlerts = jest.fn() as jest.MockedFunction<
+	typeof api.fetchAlerts
+>;
+const mockSubmitSensorReading = jest.fn() as jest.MockedFunction<
+	typeof api.submitSensorReading
+>;
+const mockFetchUnits = jest.fn() as jest.MockedFunction<typeof api.fetchUnits>;
+
+// Override the imported api functions with mocks
+Object.assign(api, {
+	fetchAlerts: mockFetchAlerts,
+	submitSensorReading: mockSubmitSensorReading,
+	fetchUnits: mockFetchUnits,
+});
 
 describe("AlertFetcher Component", () => {
-	const mockFetchAlerts = api.fetchAlerts as jest.MockedFunction<
-		typeof api.fetchAlerts
-	>;
-
 	beforeEach(() => {
 		jest.clearAllMocks();
 	});

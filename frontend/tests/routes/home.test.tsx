@@ -4,14 +4,21 @@ import userEvent from "@testing-library/user-event";
 import { api } from "~/lib/api";
 import Home from "~/routes/home";
 
-// Mock the API module
-jest.mock("~/lib/api", () => ({
-	api: {
-		fetchUnits: jest.fn(),
-		fetchAlerts: jest.fn(),
-		submitSensorReading: jest.fn(),
-	},
-}));
+// Manual mocking approach for ESM compatibility
+const mockFetchUnits = jest.fn() as jest.MockedFunction<typeof api.fetchUnits>;
+const mockFetchAlerts = jest.fn() as jest.MockedFunction<
+	typeof api.fetchAlerts
+>;
+const mockSubmitSensorReading = jest.fn() as jest.MockedFunction<
+	typeof api.submitSensorReading
+>;
+
+// Override the imported api functions with mocks
+Object.assign(api, {
+	fetchUnits: mockFetchUnits,
+	fetchAlerts: mockFetchAlerts,
+	submitSensorReading: mockSubmitSensorReading,
+});
 
 // Mock import.meta.env
 const mockEnv = {
@@ -24,13 +31,6 @@ Object.defineProperty(import.meta, "env", {
 });
 
 describe("Home Page Integration", () => {
-	const mockFetchUnits = api.fetchUnits as jest.MockedFunction<
-		typeof api.fetchUnits
-	>;
-	const mockFetchAlerts = api.fetchAlerts as jest.MockedFunction<
-		typeof api.fetchAlerts
-	>;
-
 	beforeEach(() => {
 		jest.clearAllMocks();
 		mockEnv.VITE_SHOW_DEV_TOOLS = "false";

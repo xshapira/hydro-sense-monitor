@@ -76,7 +76,13 @@ export default function Home() {
 					</div>
 
 					{/* Random Reading Generator - Development Only */}
-					{import.meta.env.VITE_SHOW_DEV_TOOLS === "true" && (
+					{(() => {
+						try {
+							return import.meta.env.VITE_SHOW_DEV_TOOLS === "true";
+						} catch {
+							return false;
+						}
+					})() && (
 						<div className="bg-white rounded-xl shadow-md p-6">
 							<h2 className="text-xl font-semibold text-gray-900 mb-6">
 								Test Sensor Classification

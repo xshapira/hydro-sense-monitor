@@ -5,18 +5,23 @@ import { UnitsHealthDashboard } from "~/common/components/units-health-dashboard
 import { api } from "~/lib/api";
 import type { UnitStatus } from "~/lib/api";
 
-// Mock the API module
-jest.mock("~/lib/api", () => ({
-	api: {
-		fetchUnits: jest.fn(),
-	},
-}));
+// Manual mocking approach for ESM compatibility
+const mockFetchUnits = jest.fn() as jest.MockedFunction<typeof api.fetchUnits>;
+const mockFetchAlerts = jest.fn() as jest.MockedFunction<
+	typeof api.fetchAlerts
+>;
+const mockSubmitSensorReading = jest.fn() as jest.MockedFunction<
+	typeof api.submitSensorReading
+>;
+
+// Override the imported api functions with mocks
+Object.assign(api, {
+	fetchUnits: mockFetchUnits,
+	fetchAlerts: mockFetchAlerts,
+	submitSensorReading: mockSubmitSensorReading,
+});
 
 describe("UnitsHealthDashboard Component", () => {
-	const mockFetchUnits = api.fetchUnits as jest.MockedFunction<
-		typeof api.fetchUnits
-	>;
-
 	const mockUnits: UnitStatus[] = [
 		{
 			unitId: "unit-1",

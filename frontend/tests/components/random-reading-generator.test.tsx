@@ -4,12 +4,21 @@ import userEvent from "@testing-library/user-event";
 import { RandomReadingGenerator } from "~/common/components/random-reading-generator";
 import { api } from "~/lib/api";
 
-// Mock the API module
-jest.mock("~/lib/api", () => ({
-	api: {
-		submitSensorReading: jest.fn(),
-	},
-}));
+// Manual mocking approach for ESM compatibility
+const mockSubmitSensorReading = jest.fn() as jest.MockedFunction<
+	typeof api.submitSensorReading
+>;
+const mockFetchAlerts = jest.fn() as jest.MockedFunction<
+	typeof api.fetchAlerts
+>;
+const mockFetchUnits = jest.fn() as jest.MockedFunction<typeof api.fetchUnits>;
+
+// Override the imported api functions with mocks
+Object.assign(api, {
+	submitSensorReading: mockSubmitSensorReading,
+	fetchAlerts: mockFetchAlerts,
+	fetchUnits: mockFetchUnits,
+});
 
 // Mock Math.random for predictable tests
 const mockMath = Object.create(global.Math);
@@ -17,11 +26,6 @@ mockMath.random = jest.fn();
 global.Math = mockMath;
 
 describe("RandomReadingGenerator Component", () => {
-	const mockSubmitSensorReading =
-		api.submitSensorReading as jest.MockedFunction<
-			typeof api.submitSensorReading
-		>;
-
 	beforeEach(() => {
 		jest.clearAllMocks();
 		(Math.random as jest.Mock).mockReturnValue(0.5);
@@ -177,10 +181,9 @@ describe("RandomReadingGenerator Component", () => {
 				expect(mockSubmitSensorReading).toHaveBeenCalled();
 			});
 
-			const lastCall =
-				mockSubmitSensorReading.mock.calls[
-					mockSubmitSensorReading.mock.calls.length - 1
-				][0];
+			const lastCall = mockSubmitSensorReading.mock.calls[
+				mockSubmitSensorReading.mock.calls.length - 1
+			][0] as Parameters<typeof mockSubmitSensorReading>[0];
 			const { pH, temp, ec } = lastCall.readings;
 
 			// Check ranges
