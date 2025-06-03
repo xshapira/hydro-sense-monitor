@@ -36,6 +36,7 @@ export function UnitsHealthDashboard({
 		try {
 			const response = await api.fetchUnits();
 			setUnits(response.units);
+			setCurrentPage(1); // Reset to page 1 when data changes
 		} catch (err) {
 			if (err instanceof Error) {
 				setError(err.message);
@@ -79,9 +80,55 @@ export function UnitsHealthDashboard({
 
 	// Pagination calculations
 	const totalPages = Math.ceil(units.length / itemsPerPage);
-	const startIndex = (currentPage - 1) * itemsPerPage;
+
+	// Ensure current page is valid
+	const validCurrentPage = Math.min(currentPage, Math.max(1, totalPages));
+	const startIndex = (validCurrentPage - 1) * itemsPerPage;
 	const endIndex = startIndex + itemsPerPage;
 	const currentUnits = units.slice(startIndex, endIndex);
+
+	// Update current page if it's invalid
+	useEffect(() => {
+		if (currentPage !== validCurrentPage) {
+			setCurrentPage(validCurrentPage);
+		}
+	}, [currentPage, validCurrentPage]);
+
+	// Generate page numbers with ellipsis
+	const getPageNumbers = () => {
+		const delta = 2; // Number of pages to show on each side of current page
+		const range = [];
+		const rangeWithDots = [];
+
+		// Always show first page
+		range.push(1);
+
+		// Add pages around current page
+		for (
+			let i = Math.max(2, validCurrentPage - delta);
+			i <= Math.min(totalPages - 1, validCurrentPage + delta);
+			i++
+		) {
+			range.push(i);
+		}
+
+		// Always show last page if more than 1 page
+		if (totalPages > 1) {
+			range.push(totalPages);
+		}
+
+		// Add ellipsis where needed
+		let prev = 0;
+		for (const i of range) {
+			if (i - prev > 1) {
+				rangeWithDots.push({ type: "ellipsis", key: `ellipsis-${prev}-${i}` });
+			}
+			rangeWithDots.push({ type: "page", value: i });
+			prev = i;
+		}
+
+		return rangeWithDots;
+	};
 
 	const handleBackdropClick = (e: React.MouseEvent) => {
 		if (e.target === e.currentTarget) {
@@ -228,16 +275,16 @@ export function UnitsHealthDashboard({
 
 				{/* Pagination Controls */}
 				{totalPages > 1 && (
-					<div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
-						<div className="text-sm text-gray-700">
+					<div className="px-6 py-4 border-t border-gray-200">
+						<div className="text-sm text-gray-700 text-center mb-4">
 							Showing {startIndex + 1}-{Math.min(endIndex, units.length)} of{" "}
 							{units.length} units
 						</div>
-						<div className="flex items-center space-x-2">
+						<div className="flex items-center justify-center space-x-2">
 							<button
 								type="button"
-								onClick={() => setCurrentPage(currentPage - 1)}
-								disabled={currentPage === 1}
+								onClick={() => setCurrentPage(validCurrentPage - 1)}
+								disabled={validCurrentPage === 1}
 								className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
 								aria-label="Previous page"
 							>
@@ -245,20 +292,27 @@ export function UnitsHealthDashboard({
 							</button>
 
 							<div className="flex items-center space-x-1">
-								{Array.from({ length: totalPages }, (_, i) => i + 1).map(
-									(page) => (
+								{getPageNumbers().map((item) =>
+									item.type === "ellipsis" ? (
+										<span
+											key={item.key}
+											className="px-3 py-2 text-sm text-gray-500"
+										>
+											...
+										</span>
+									) : (
 										<button
-											key={page}
+											key={item.value}
 											type="button"
-											onClick={() => setCurrentPage(page)}
+											onClick={() => setCurrentPage(item.value)}
 											className={`px-3 py-2 text-sm font-medium rounded-md ${
-												page === currentPage
+												item.value === validCurrentPage
 													? "bg-emerald-600 text-white"
 													: "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
 											}`}
-											aria-label={`Go to page ${page}`}
+											aria-label={`Go to page ${item.value}`}
 										>
-											{page}
+											{item.value}
 										</button>
 									),
 								)}
@@ -266,8 +320,8 @@ export function UnitsHealthDashboard({
 
 							<button
 								type="button"
-								onClick={() => setCurrentPage(currentPage + 1)}
-								disabled={currentPage === totalPages}
+								onClick={() => setCurrentPage(validCurrentPage + 1)}
+								disabled={validCurrentPage === totalPages}
 								className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
 								aria-label="Next page"
 							>
