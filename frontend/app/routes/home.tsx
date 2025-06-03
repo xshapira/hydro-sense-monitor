@@ -62,13 +62,15 @@ export default function Home() {
 						<AlertFetcher prefilledUnitId={selectedUnitId} />
 					</div>
 
-					{/* Random Reading Generator */}
-					<div className="bg-white rounded-xl shadow-md p-6">
-						<h2 className="text-xl font-semibold text-gray-900 mb-6">
-							Test Sensor Classification
-						</h2>
-						<RandomReadingGenerator />
-					</div>
+					{/* Random Reading Generator - Development Only */}
+					{import.meta.env.VITE_SHOW_DEV_TOOLS === "true" && (
+						<div className="bg-white rounded-xl shadow-md p-6">
+							<h2 className="text-xl font-semibold text-gray-900 mb-6">
+								Test Sensor Classification
+							</h2>
+							<RandomReadingGenerator />
+						</div>
+					)}
 				</div>
 			</main>
 
