@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_serializer, field_validator
 
 
 class SensorReadings(BaseModel):
@@ -66,7 +66,11 @@ class SensorDataRecord(BaseModel):
     readings: SensorReadings
     classification: str
 
-    model_config = ConfigDict(json_encoders={datetime: lambda v: v.isoformat()})
+    @field_serializer("timestamp")
+    def serialize_timestamp(self, timestamp: datetime) -> str:
+        return timestamp.isoformat()
+
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class AlertsResponse(BaseModel):
