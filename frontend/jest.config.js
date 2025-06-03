@@ -4,10 +4,19 @@ export default {
 	testEnvironment: "jsdom",
 	rootDir: ".",
 	extensionsToTreatAsEsm: [".ts", ".tsx"],
+	globals: {
+		"import.meta": {
+			env: {
+				VITE_API_URL: "http://127.0.0.1:8000/api/v1",
+				VITE_SHOW_DEV_TOOLS: "true",
+			},
+		},
+	},
 	moduleNameMapper: {
 		"^~/(.*)$": "<rootDir>/app/$1",
 		"\\.(css|scss|sass)$": "identity-obj-proxy",
 	},
+	setupFiles: ["<rootDir>/tests/__mocks__/vite-env.ts"],
 	setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
 	testMatch: ["<rootDir>/tests/**/*.test.(ts|tsx|js)"],
 	transform: {
