@@ -6,11 +6,13 @@ import { Button } from "./button";
 interface UnitsHealthDashboardProps {
 	onUnitClick?: (unitId: string) => void;
 	onClose?: () => void;
+	isVisible: boolean;
 }
 
 export function UnitsHealthDashboard({
 	onUnitClick,
 	onClose,
+	isVisible,
 }: UnitsHealthDashboardProps) {
 	const [units, setUnits] = useState<UnitStatus[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -73,9 +75,34 @@ export function UnitsHealthDashboard({
 		return new Date(timestamp).toLocaleString();
 	};
 
+	const handleBackdropClick = (e: React.MouseEvent) => {
+		if (e.target === e.currentTarget) {
+			onClose?.();
+		}
+	};
+
+	const handleBackdropKeyDown = (e: React.KeyboardEvent) => {
+		if (e.key === "Escape") {
+			onClose?.();
+		}
+	};
+
 	return (
-		<div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-			<div className="bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+		<div
+			className={`fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 transition-opacity duration-200 ease-in-out ${
+				isVisible ? "opacity-100" : "opacity-0"
+			}`}
+			onClick={handleBackdropClick}
+			onKeyDown={handleBackdropKeyDown}
+			tabIndex={-1}
+		>
+			<div
+				className={`bg-white rounded-lg max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col transition-all duration-200 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+					isVisible
+						? "opacity-100 scale-100 translate-y-0"
+						: "opacity-0 scale-95 translate-y-4"
+				}`}
+			>
 				<div className="p-6 border-b border-gray-200">
 					<div className="flex items-center justify-between">
 						<h2 className="text-2xl font-semibold text-gray-900">

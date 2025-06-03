@@ -17,7 +17,20 @@ export function meta(_: Route.MetaArgs) {
 
 export default function Home() {
 	const [showUnitsModal, setShowUnitsModal] = useState(false);
+	const [isModalVisible, setIsModalVisible] = useState(false);
 	const [selectedUnitId, setSelectedUnitId] = useState<string>("");
+
+	const openModal = () => {
+		setShowUnitsModal(true);
+		// Small delay to allow the DOM to update before starting animation
+		setTimeout(() => setIsModalVisible(true), 10);
+	};
+
+	const closeModal = () => {
+		setIsModalVisible(false);
+		// Wait for animation to complete before removing from DOM
+		setTimeout(() => setShowUnitsModal(false), 200);
+	};
 
 	return (
 		<div className="min-h-screen bg-gray-100">
@@ -44,7 +57,7 @@ export default function Home() {
 							View the health status of all your hydroponic units at a glance
 						</p>
 						<Button
-							onClick={() => setShowUnitsModal(true)}
+							onClick={openModal}
 							className="w-full h-12 bg-emerald-600 hover:bg-emerald-700 text-white text-base font-medium cursor-pointer transition-colors duration-200 ease-in-out"
 						>
 							View All Units
@@ -77,10 +90,11 @@ export default function Home() {
 			{/* Units Health Dashboard Modal */}
 			{showUnitsModal && (
 				<UnitsHealthDashboard
-					onClose={() => setShowUnitsModal(false)}
+					isVisible={isModalVisible}
+					onClose={closeModal}
 					onUnitClick={(unitId) => {
 						setSelectedUnitId(unitId);
-						setShowUnitsModal(false);
+						closeModal();
 					}}
 				/>
 			)}
