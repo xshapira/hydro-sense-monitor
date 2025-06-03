@@ -18,6 +18,8 @@ export function UnitsHealthDashboard({
 	const [loading, setLoading] = useState(true);
 	const [refreshing, setRefreshing] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [currentPage, setCurrentPage] = useState(1);
+	const itemsPerPage = 9; // 3x3 grid
 
 	useEffect(() => {
 		fetchUnits();
@@ -74,6 +76,12 @@ export function UnitsHealthDashboard({
 	const formatTimestamp = (timestamp: string) => {
 		return new Date(timestamp).toLocaleString();
 	};
+
+	// Pagination calculations
+	const totalPages = Math.ceil(units.length / itemsPerPage);
+	const startIndex = (currentPage - 1) * itemsPerPage;
+	const endIndex = startIndex + itemsPerPage;
+	const currentUnits = units.slice(startIndex, endIndex);
 
 	const handleBackdropClick = (e: React.MouseEvent) => {
 		if (e.target === e.currentTarget) {
@@ -148,7 +156,7 @@ export function UnitsHealthDashboard({
 						</div>
 					) : (
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-							{units.map((unit) => (
+							{currentUnits.map((unit) => (
 								<button
 									key={unit.unitId}
 									type="button"
