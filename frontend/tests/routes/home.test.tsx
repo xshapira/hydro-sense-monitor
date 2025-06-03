@@ -27,6 +27,7 @@ const mockEnv = {
 
 Object.defineProperty(import.meta, "env", {
 	value: mockEnv,
+	writable: true,
 	configurable: true,
 });
 
@@ -34,6 +35,10 @@ describe("Home Page Integration", () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 		mockEnv.VITE_SHOW_DEV_TOOLS = "false";
+		// Reset all mocks to have no implementations
+		mockFetchUnits.mockReset();
+		mockFetchAlerts.mockReset();
+		mockSubmitSensorReading.mockReset();
 	});
 
 	it("renders main components", () => {
@@ -161,9 +166,7 @@ describe("Home Page Integration", () => {
 	});
 
 	it("shows random reading generator when dev tools are enabled", () => {
-		mockEnv.VITE_SHOW_DEV_TOOLS = "true";
-
-		render(<Home />);
+		render(<Home showDevTools={true} />);
 
 		expect(screen.getByText("Test Sensor Classification")).toBeInTheDocument();
 		expect(
@@ -172,9 +175,7 @@ describe("Home Page Integration", () => {
 	});
 
 	it("hides random reading generator when dev tools are disabled", () => {
-		mockEnv.VITE_SHOW_DEV_TOOLS = "false";
-
-		render(<Home />);
+		render(<Home showDevTools={false} />);
 
 		expect(
 			screen.queryByText("Test Sensor Classification"),
