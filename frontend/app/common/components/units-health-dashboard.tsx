@@ -226,6 +226,57 @@ export function UnitsHealthDashboard({
 					)}
 				</div>
 
+				{/* Pagination Controls */}
+				{totalPages > 1 && (
+					<div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between">
+						<div className="text-sm text-gray-700">
+							Showing {startIndex + 1}-{Math.min(endIndex, units.length)} of{" "}
+							{units.length} units
+						</div>
+						<div className="flex items-center space-x-2">
+							<button
+								type="button"
+								onClick={() => setCurrentPage(currentPage - 1)}
+								disabled={currentPage === 1}
+								className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+								aria-label="Previous page"
+							>
+								Previous
+							</button>
+
+							<div className="flex items-center space-x-1">
+								{Array.from({ length: totalPages }, (_, i) => i + 1).map(
+									(page) => (
+										<button
+											key={page}
+											type="button"
+											onClick={() => setCurrentPage(page)}
+											className={`px-3 py-2 text-sm font-medium rounded-md ${
+												page === currentPage
+													? "bg-emerald-600 text-white"
+													: "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
+											}`}
+											aria-label={`Go to page ${page}`}
+										>
+											{page}
+										</button>
+									),
+								)}
+							</div>
+
+							<button
+								type="button"
+								onClick={() => setCurrentPage(currentPage + 1)}
+								disabled={currentPage === totalPages}
+								className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+								aria-label="Next page"
+							>
+								Next
+							</button>
+						</div>
+					</div>
+				)}
+
 				<div className="p-4 border-t border-gray-200 bg-gray-50">
 					<Button
 						onClick={() => fetchUnits(true)}
