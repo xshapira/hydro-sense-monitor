@@ -97,8 +97,12 @@ export function UnitsHealthDashboard({
 	// Generate page numbers with ellipsis
 	const getPageNumbers = () => {
 		const delta = 2; // Number of pages to show on each side of current page
-		const range = [];
-		const rangeWithDots = [];
+		const range: number[] = [];
+		const rangeWithDots: Array<{
+			type: "ellipsis" | "page";
+			value?: number;
+			key: string;
+		}> = [];
 
 		// Always show first page
 		range.push(1);
@@ -123,7 +127,7 @@ export function UnitsHealthDashboard({
 			if (i - prev > 1) {
 				rangeWithDots.push({ type: "ellipsis", key: `ellipsis-${prev}-${i}` });
 			}
-			rangeWithDots.push({ type: "page", value: i });
+			rangeWithDots.push({ type: "page", value: i, key: `page-${i}` });
 			prev = i;
 		}
 
@@ -302,9 +306,9 @@ export function UnitsHealthDashboard({
 										</span>
 									) : (
 										<button
-											key={item.value}
+											key={item.key}
 											type="button"
-											onClick={() => setCurrentPage(item.value)}
+											onClick={() => item.value && setCurrentPage(item.value)}
 											className={`px-3 py-2 text-sm font-medium rounded-md ${
 												item.value === validCurrentPage
 													? "bg-emerald-600 text-white"
