@@ -104,6 +104,8 @@ describe("Home Page Integration", () => {
 		mockFetchAlerts.mockResolvedValueOnce({
 			unitId: "unit-123",
 			alerts: [],
+			unitExists: true,
+			totalReadings: 5,
 		});
 
 		render(<Home />);
@@ -198,6 +200,8 @@ describe("Home Page Integration", () => {
 		mockFetchAlerts.mockResolvedValueOnce({
 			unitId: "unit-456",
 			alerts: mockAlerts,
+			unitExists: true,
+			totalReadings: 8,
 		});
 
 		render(<Home />);

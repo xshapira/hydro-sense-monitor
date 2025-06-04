@@ -63,6 +63,8 @@ describe("AlertFetcher Component", () => {
 		mockFetchAlerts.mockResolvedValueOnce({
 			unitId: "unit-123",
 			alerts: mockAlerts,
+			unitExists: true,
+			totalReadings: 5,
 		});
 
 		render(<AlertFetcher />);
@@ -92,10 +94,12 @@ describe("AlertFetcher Component", () => {
 		expect(screen.getAllByText("Needs Attention")).toHaveLength(2);
 	});
 
-	it("shows message when no alerts found", async () => {
+	it("shows green message when unit exists but has no alerts", async () => {
 		mockFetchAlerts.mockResolvedValueOnce({
 			unitId: "unit-456",
 			alerts: [],
+			unitExists: true,
+			totalReadings: 3,
 		});
 
 		render(<AlertFetcher />);
@@ -108,9 +112,48 @@ describe("AlertFetcher Component", () => {
 
 		await waitFor(() => {
 			expect(
-				screen.getByText(/No alerts found for unit "unit-456"/),
+				screen.getByText(
+					'No alerts found for unit "unit-456". This unit has no issues.',
+				),
 			).toBeInTheDocument();
 		});
+
+		// Check that it's displayed with green styling
+		const messageContainer = screen.getByText(
+			'No alerts found for unit "unit-456". This unit has no issues.',
+		).parentElement;
+		expect(messageContainer).toHaveClass("bg-green-50");
+	});
+
+	it("shows red message when unit doesn't exist", async () => {
+		mockFetchAlerts.mockResolvedValueOnce({
+			unitId: "unit-nonexistent",
+			alerts: [],
+			unitExists: false,
+			totalReadings: 0,
+		});
+
+		render(<AlertFetcher />);
+
+		const input = screen.getByPlaceholderText("Unit ID");
+		await userEvent.type(input, "unit-nonexistent");
+
+		const button = screen.getByRole("button", { name: "Fetch Alerts" });
+		await userEvent.click(button);
+
+		await waitFor(() => {
+			expect(
+				screen.getByText(
+					'No alerts found for unit "unit-nonexistent". This unit doesn\'t exist.',
+				),
+			).toBeInTheDocument();
+		});
+
+		// Check that it's displayed with red styling
+		const messageContainer = screen.getByText(
+			'No alerts found for unit "unit-nonexistent". This unit doesn\'t exist.',
+		).parentElement;
+		expect(messageContainer).toHaveClass("bg-red-50");
 	});
 
 	it("handles API errors gracefully", async () => {
@@ -133,7 +176,16 @@ describe("AlertFetcher Component", () => {
 		mockFetchAlerts.mockImplementation(
 			() =>
 				new Promise((resolve) =>
-					setTimeout(() => resolve({ unitId: "unit-123", alerts: [] }), 100),
+					setTimeout(
+						() =>
+							resolve({
+								unitId: "unit-123",
+								alerts: [],
+								unitExists: true,
+								totalReadings: 2,
+							}),
+						100,
+					),
 				),
 		);
 
@@ -164,6 +216,8 @@ describe("AlertFetcher Component", () => {
 		mockFetchAlerts.mockResolvedValueOnce({
 			unitId: "unit-123",
 			alerts: [],
+			unitExists: false,
+			totalReadings: 0,
 		});
 
 		render(<AlertFetcher />);

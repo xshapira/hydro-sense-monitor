@@ -114,6 +114,8 @@ async def test_get_alerts_with_data(client):
 
     assert data["unitId"] == "unit-test"
     assert len(data["alerts"]) == 2  # Should have 2 "Needs Attention" readings
+    assert data["unitExists"]
+    assert data["totalReadings"] == 4  # We submitted 4 readings total
 
     # Verify alerts are all "Needs Attention"
     for alert in data["alerts"]:
@@ -136,6 +138,8 @@ async def test_get_alerts_empty_unit(client):
     data = response.json()
     assert data["unitId"] == "nonexistent-unit"
     assert data["alerts"] == []
+    assert not data["unitExists"]
+    assert data["totalReadings"] == 0
 
 
 @pytest.mark.asyncio
