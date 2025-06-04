@@ -1,8 +1,7 @@
 import pytest
+from backend.app.api.routes.sensor import SENSOR_READINGS_STORE
+from backend.app.main import app
 from httpx import ASGITransport, AsyncClient
-
-from app.api.routes.sensor import SENSOR_READINGS_STORE
-from app.main import app
 
 
 @pytest.fixture(autouse=True)

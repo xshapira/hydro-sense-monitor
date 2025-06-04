@@ -2,13 +2,12 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 import pytest
-
-from app.api.routes.sensor import (
+from backend.app.api.routes.sensor import (
     classify_reading,
     validate_sensor_readings,
     validate_timestamp,
 )
-from app.exceptions import InvalidSensorReadingsError, InvalidTimestampError
+from backend.app.exceptions import InvalidSensorReadingsError, InvalidTimestampError
 
 
 def test_classify_reading_healthy():
