@@ -25,7 +25,7 @@ jobs:
         run: uv sync
       - name: Run backend tests
         working-directory: ./backend
-        run: uv run pytest
+        run: PYTHONPATH=.. uv run pytest
       - name: Run backend linting
         working-directory: ./backend
         run: uv run ruff check .
