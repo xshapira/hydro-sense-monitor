@@ -228,6 +228,7 @@ async def get_unit_alerts(
     unit_id = unit_id.strip()
 
     unit_readings = SENSOR_READINGS_STORE.get(unit_id, [])
+    unit_exists = len(unit_readings) > 0
 
     alerts = [
         reading
@@ -246,7 +247,12 @@ async def get_unit_alerts(
     # Always return 200 OK even for non-existent units or empty results.
     # A 404 would imply something is wrong, but having no alerts means the
     # system is healthy.
-    return AlertsResponse(unitId=unit_id, alerts=alerts)
+    return AlertsResponse(
+        unitId=unit_id,
+        alerts=alerts,
+        unitExists=unit_exists,
+        totalReadings=len(unit_readings),
+    )
 
 
 @router.get(

@@ -80,6 +80,14 @@ class AlertsResponse(BaseModel):
 
     unit_id: str = Field(..., alias="unitId")
     alerts: list[SensorDataRecord]
+    unit_exists: bool = Field(
+        ..., alias="unitExists", description="Whether the unit has any readings"
+    )
+    total_readings: int = Field(
+        ..., alias="totalReadings", description="Total number of readings for this unit"
+    )
+
+    model_config = ConfigDict(populate_by_name=True)
 
 
 class UnitStatus(BaseModel):
