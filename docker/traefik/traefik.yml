@@ -6,6 +6,8 @@ api:
 entryPoints:
   web:
     address: ":80"
+  traefik:
+    address: ":8080"
 
 providers:
   # Use static file configuration since AWS Lightsail doesn't support Docker socket access

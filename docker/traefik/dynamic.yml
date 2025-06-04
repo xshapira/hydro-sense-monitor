@@ -5,7 +5,7 @@ http:
     frontend-service:
       loadBalancer:
         servers:
-          - url: "http://hydro-sense-monitor-frontend:3000"
+          - url: "http://localhost:3000"
         healthCheck:
           path: "/"
           interval: "30s"
@@ -14,7 +14,7 @@ http:
     backend-service:
       loadBalancer:
         servers:
-          - url: "http://hydro-sense-monitor-backend:8000"
+          - url: "http://localhost:8000"
         healthCheck:
           path: "/healthcheck"
           interval: "30s"
@@ -26,21 +26,29 @@ http:
     ping:
       rule: "Path(`/ping`)"
       service: "ping@internal"
+      entryPoints:
+        - "web"
       priority: 1000
 
     # API routes - send /api requests to backend
     api-router:
       rule: "PathPrefix(`/api`)"
       service: "backend-service"
+      entryPoints:
+        - "web"
       priority: 100
 
     # Frontend routes - send everything else to frontend
     frontend-router:
       rule: "PathPrefix(`/`)"
       service: "frontend-service"
+      entryPoints:
+        - "web"
       priority: 1
 
     # Enable dashboard access
     dashboard:
       rule: "Host(`traefik.localhost`) || PathPrefix(`/dashboard`)"
       service: "api@internal"
+      entryPoints:
+        - "traefik"
