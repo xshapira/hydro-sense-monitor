@@ -45,6 +45,8 @@ export interface Alert {
 export interface AlertsResponse {
 	unitId: string;
 	alerts: Alert[];
+	unitExists: boolean;
+	totalReadings: number;
 }
 
 export interface UnitStatus {

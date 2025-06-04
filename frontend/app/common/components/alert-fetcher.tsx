@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { api } from "../../lib/api";
-import type { Alert } from "../../lib/api";
+import type { Alert, AlertsResponse } from "../../lib/api";
 import { Button } from "./button";
 import { Input } from "./input";
 import {
@@ -22,6 +22,9 @@ export function AlertFetcher({ prefilledUnitId }: AlertFetcherProps) {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [hasSearched, setHasSearched] = useState(false);
+	const [alertsResponse, setAlertsResponse] = useState<AlertsResponse | null>(
+		null,
+	);
 
 	// Update unitId when prefilledUnitId changes
 	useEffect(() => {
@@ -42,6 +45,7 @@ export function AlertFetcher({ prefilledUnitId }: AlertFetcherProps) {
 		try {
 			const response = await api.fetchAlerts(unitId);
 			setAlerts(response.alerts);
+			setAlertsResponse(response);
 			setHasSearched(true);
 		} catch (err) {
 			if (err instanceof Error) {
@@ -85,11 +89,20 @@ export function AlertFetcher({ prefilledUnitId }: AlertFetcherProps) {
 				{error && <p className="text-sm text-red-600 mt-2">{error}</p>}
 			</div>
 
-			{hasSearched && alerts.length === 0 && !error && (
-				<div className="mt-6 p-4 bg-red-50 rounded-lg">
-					<p className="text-sm text-red-600 text-center">
-						No alerts found for unit "{unitId}". This unit either has no issues
-						or doesn't exist.
+			{hasSearched && alerts.length === 0 && !error && alertsResponse && (
+				<div
+					className={`mt-6 p-4 rounded-lg ${
+						alertsResponse.unitExists ? "bg-green-50" : "bg-red-50"
+					}`}
+				>
+					<p
+						className={`text-sm text-center ${
+							alertsResponse.unitExists ? "text-green-600" : "text-red-600"
+						}`}
+					>
+						{alertsResponse.unitExists
+							? `No alerts found for unit "${unitId}". This unit has no issues.`
+							: `No alerts found for unit "${unitId}". This unit doesn't exist.`}
 					</p>
 				</div>
 			)}
