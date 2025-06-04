@@ -82,7 +82,7 @@ jobs:
       - name: ⚙️ Installing system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y jq unzip make
+          sudo apt-get install -y jq unzip make gettext-base
       - name: 🏢 Install AWS CLI and Lightsail
         run: |
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -112,22 +112,27 @@ jobs:
           cp aws/${{ matrix.service }}-deploymentconfig.json aws/temp/deploymentconfig.json
           cp aws/${{ matrix.service }}-publicendpoint.json aws/temp/publicendpoint.json
 
-          # Replace placeholders in deployment config
-          sed -i "s/\${SERVICE_NAME}/${{ env.SERVICE_NAME }}/g" aws/temp/deploymentconfig.json
-          sed -i "s/\${SERVICE_PORT}/${{ env.SERVICE_PORT }}/g" aws/temp/deploymentconfig.json
+          # Set up environment variables for envsubst
+          export SERVICE_NAME="${{ env.SERVICE_NAME }}"
+          export SERVICE_PORT="${{ env.SERVICE_PORT }}"
 
-          # Replace environment-specific placeholders
           if [ "${{ matrix.service }}" = "backend" ]; then
-            sed -i "s/\${PROJECT_NAME}/${{ env.PROJECT_NAME }}/g" aws/temp/deploymentconfig.json
-            sed -i "s|\${BACKEND_CORS_ORIGINS}|${{ secrets.BACKEND_CORS_ORIGINS }}|g" aws/temp/deploymentconfig.json
+            export PROJECT_NAME="${{ env.PROJECT_NAME }}"
+            export BACKEND_CORS_ORIGINS="${{ secrets.BACKEND_CORS_ORIGINS }}"
+            # Replace all placeholders using envsubst
+            envsubst '${SERVICE_NAME} ${SERVICE_PORT} ${PROJECT_NAME} ${BACKEND_CORS_ORIGINS}' < aws/temp/deploymentconfig.json > aws/temp/deploymentconfig.tmp
           else
-            sed -i "s|\${VITE_API_URL}|${{ secrets.VITE_API_URL }}|g" aws/temp/deploymentconfig.json
-            sed -i "s/\${VITE_SHOW_DEV_TOOLS}/${{ secrets.VITE_SHOW_DEV_TOOLS }}/g" aws/temp/deploymentconfig.json
+            export VITE_API_URL="${{ secrets.VITE_API_URL }}"
+            export VITE_SHOW_DEV_TOOLS="${{ secrets.VITE_SHOW_DEV_TOOLS }}"
+            # Replace all placeholders using envsubst
+            envsubst '${SERVICE_NAME} ${SERVICE_PORT} ${VITE_API_URL} ${VITE_SHOW_DEV_TOOLS}' < aws/temp/deploymentconfig.json > aws/temp/deploymentconfig.tmp
           fi
 
+          mv aws/temp/deploymentconfig.tmp aws/temp/deploymentconfig.json
+
           # Replace placeholders in public endpoint config
-          sed -i "s/\${SERVICE_NAME}/${{ env.SERVICE_NAME }}/g" aws/temp/publicendpoint.json
-          sed -i "s/\${SERVICE_PORT}/${{ env.SERVICE_PORT }}/g" aws/temp/publicendpoint.json
+          envsubst '${SERVICE_NAME} ${SERVICE_PORT}' < aws/temp/publicendpoint.json > aws/temp/publicendpoint.tmp
+          mv aws/temp/publicendpoint.tmp aws/temp/publicendpoint.json
       - name: 📄 Verify deployment configs
         run: |
           echo "=== Deployment Config ==="
