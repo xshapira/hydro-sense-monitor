@@ -14,7 +14,7 @@ http:
     backend-service:
       loadBalancer:
         servers:
-          - url: "http://hydro-sense-monitor-backend:8000"
+          - url: "http://hydro-sense-monitor-backend:80"
         healthCheck:
           path: "/healthcheck"
           interval: "30s"
@@ -22,6 +22,12 @@ http:
 
   # Define routers (URL routing rules)
   routers:
+    # Traefik internal ping - health check
+    ping:
+      rule: "Path(`/ping`)"
+      service: "ping@internal"
+      priority: 1000
+
     # API routes - send /api requests to backend
     api-router:
       rule: "PathPrefix(`/api`)"
