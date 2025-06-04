@@ -5,6 +5,12 @@ on:
     branches: ["main"]
 permissions:
   contents: read
+env:
+  PROJECT_NAME: "HydroSense Monitor"
+  BACKEND_CORS_ORIGINS: "${{ secrets.BACKEND_CORS_ORIGINS }}"
+concurrency:
+  group: "${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}"
+  cancel-in-progress: true
 jobs:
   backend:
     name: Backend Tests
@@ -25,8 +31,6 @@ jobs:
         run: uv sync
       - name: Run backend tests
         working-directory: ./backend
-        env:
-          PROJECT_NAME: "HydroSense Monitor"
         run: PYTHONPATH=.. uv run pytest
       - name: Run backend linting
         working-directory: ./backend
