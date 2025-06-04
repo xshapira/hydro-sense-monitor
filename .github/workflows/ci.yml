@@ -190,7 +190,6 @@ jobs:
 
           # Cleanup temp directory
           rm -rf aws/temp
-
   deploy:
     name: 🚀 Deploy to Lightsail
     runs-on: ubuntu-latest
@@ -199,12 +198,10 @@ jobs:
     steps:
       - name: 🗂 Getting code from Github
         uses: actions/checkout@v4
-
       - name: ⚙️ Installing system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y jq unzip make gettext-base
-
       - name: 🏢 Install AWS CLI and Lightsail
         run: |
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
@@ -214,20 +211,19 @@ jobs:
           curl "https://s3.us-west-2.amazonaws.com/lightsailctl/latest/linux-amd64/lightsailctl" -o "lightsailctl"
           sudo mv "lightsailctl" "/usr/local/bin/lightsailctl"
           sudo chmod +x /usr/local/bin/lightsailctl
-
       - name: 🤐 Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: ${{ env.AWS_REGION }}
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-
       - name: 📄 Create combined deployment configuration
         run: |
           mkdir -p aws/temp
 
           # Use jq to create proper JSON to avoid escaping issues
           jq -n \
+            --arg service_name "${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}" \
             --arg backend_name "${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-backend" \
             --arg frontend_name "${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-frontend" \
             --arg project_name "${{ env.PROJECT_NAME }}" \
@@ -236,7 +232,7 @@ jobs:
             --arg vite_dev_tools "${{ secrets.VITE_SHOW_DEV_TOOLS }}" \
             '{
               ($backend_name): {
-                "image": (":" + $backend_name + "." + $backend_name + ".latest"),
+                "image": (":" + $service_name + "." + $backend_name + ".latest"),
                 "ports": {
                   "80": "HTTP"
                 },
@@ -246,7 +242,7 @@ jobs:
                 }
               },
               ($frontend_name): {
-                "image": (":" + $frontend_name + "." + $frontend_name + ".latest"),
+                "image": (":" + $service_name + "." + $frontend_name + ".latest"),
                 "ports": {
                   "3000": "HTTP"
                 },
@@ -272,24 +268,21 @@ jobs:
                 "successCodes": "200-399"
               }
             }' > aws/temp/publicendpoint.json
-
       - name: 📄 Verify deployment configs
         run: |
           echo "=== Combined Deployment Config ==="
           cat aws/temp/deploymentconfig.json
           echo "=== Public Endpoint Config ==="
           cat aws/temp/publicendpoint.json
-
-      - name: 🚀 Deploy both containers to Lightsail
+      - name: 🚀 Deploy containers to Lightsail
         run: |
           aws lightsail create-container-service-deployment \
             --service-name ${{ env.AWS_LIGHTSAIL_SERVICE_NAME }} \
             --containers file://aws/temp/deploymentconfig.json \
             --public-endpoint file://aws/temp/publicendpoint.json
-
       - name: ✅ Deployment completed
         run: |
-          echo "🎉 Successfully deployed both backend and frontend containers!"
+          echo "🎉 Successfully deployed backend and frontend containers!"
           echo "Service: ${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}"
           echo "Region: ${{ env.AWS_REGION }}"
           echo "Frontend (public): ${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-frontend"
