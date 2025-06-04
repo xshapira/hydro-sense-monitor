@@ -77,7 +77,7 @@ export const api = {
 		}
 
 		const response = await fetch(
-			`${API_BASE_URL}/alerts?unit_id=${encodeURIComponent(unitId)}`,
+			`${API_BASE_URL}/alerts?unitId=${encodeURIComponent(unitId)}`,
 		);
 
 		if (!response.ok) {
