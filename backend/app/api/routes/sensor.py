@@ -1,10 +1,8 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from fastapi import APIRouter, HTTPException, Query, status
-
-from app.exceptions import InvalidSensorReadingsError, InvalidTimestampError
-from app.schemas import (
+from backend.app.exceptions import InvalidSensorReadingsError, InvalidTimestampError
+from backend.app.schemas import (
     AlertsResponse,
     ClassificationStatus,
     SensorDataInput,
@@ -12,6 +10,7 @@ from app.schemas import (
     UnitsResponse,
     UnitStatus,
 )
+from fastapi import APIRouter, HTTPException, Query, status
 
 router = APIRouter()
 
