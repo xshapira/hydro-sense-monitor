@@ -1,0 +1,40 @@
+# Dynamic Configuration for Traefik
+http:
+  # Define services (backend targets)
+  services:
+    frontend-service:
+      loadBalancer:
+        servers:
+          - url: "http://hydro-sense-monitor-frontend:3000"
+        healthCheck:
+          path: "/"
+          interval: "30s"
+          timeout: "3s"
+
+    backend-service:
+      loadBalancer:
+        servers:
+          - url: "http://hydro-sense-monitor-backend:8000"
+        healthCheck:
+          path: "/healthcheck"
+          interval: "30s"
+          timeout: "3s"
+
+  # Define routers (URL routing rules)
+  routers:
+    # API routes - send /api requests to backend
+    api-router:
+      rule: "PathPrefix(`/api`)"
+      service: "backend-service"
+      priority: 100
+
+    # Frontend routes - send everything else to frontend
+    frontend-router:
+      rule: "PathPrefix(`/`)"
+      service: "frontend-service"
+      priority: 1
+
+    # Enable dashboard access
+    dashboard:
+      rule: "Host(`traefik.localhost`) || PathPrefix(`/dashboard`)"
+      service: "api@internal"

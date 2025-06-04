@@ -1,0 +1,24 @@
+# Traefik Configuration
+api:
+  dashboard: true
+  insecure: true
+
+entryPoints:
+  web:
+    address: ":80"
+
+providers:
+  # Use static file configuration since AWS Lightsail doesn't support Docker socket access
+  file:
+    filename: /etc/traefik/dynamic.yml
+    watch: true
+
+# Enable access logs
+accessLog: {}
+
+# Enable metrics for monitoring
+metrics:
+  prometheus: {}
+
+# Health check endpoint
+ping: {}

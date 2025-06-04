@@ -1,0 +1,9 @@
+{
+	"${SERVICE_NAME}": {
+		"image": ":${SERVICE_NAME}.${SERVICE_NAME}.latest",
+		"ports": {
+			"${SERVICE_PORT}": "HTTP"
+		},
+		"environment": {}
+	}
+}

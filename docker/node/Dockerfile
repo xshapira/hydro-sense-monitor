@@ -28,31 +28,30 @@ CMD ["pnpm", "react-router", "dev", "--host", "0.0.0.0"]
 
 FROM dev AS build-prod
 # Build-time arguments for Vite environment variables
+ARG VITE_API_URL
 ARG VITE_SHOW_DEV_TOOLS
 
 # Set environment variables for the build
+ENV VITE_API_URL=${VITE_API_URL}
 ENV VITE_SHOW_DEV_TOOLS=${VITE_SHOW_DEV_TOOLS}
 
 RUN pnpm run build
 RUN pnpm prune --prod
 
-FROM nginx:alpine AS production
+FROM base AS production
 
-# Copy nginx configuration
-COPY docker/node/nginx.conf /etc/nginx/conf.d/default.conf
+USER root
+
+RUN mkdir -p /app/frontend && chown -R node:node /app/frontend
+
+# Use non-root user
+USER node
 
 # Copy built application from build-prod stage
-COPY --from=build-prod /app/frontend/build /usr/share/nginx/html
+COPY --chown=node:node --from=build-prod /app/frontend/node_modules /app/frontend/node_modules
+COPY --chown=node:node --from=build-prod /app/frontend/package.json /app/frontend/package.json
+COPY --chown=node:node --from=build-prod /app/frontend/build /app/frontend/build
 
-# Create a health check script
-RUN echo '#!/bin/sh\ncurl -f http://localhost:3000/healthcheck || exit 1' > /usr/local/bin/healthcheck.sh && \
-    chmod +x /usr/local/bin/healthcheck.sh
+WORKDIR /app/frontend
 
-# Expose port 3000
-EXPOSE 3000
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD /usr/local/bin/healthcheck.sh
-
-CMD ["nginx", "-g", "daemon off;"]
+CMD ["pnpm", "start"]

@@ -75,7 +75,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     strategy:
       matrix:
-        service: [backend, frontend]
+        service: [backend, frontend, traefik]
     steps:
       - name: 🗂 Getting code from Github
         uses: actions/checkout@v4
@@ -101,8 +101,16 @@ jobs:
       - name: 📝 Set service configuration
         run: |
           echo "CONTAINER_NAME=${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-${{ matrix.service }}" >> $GITHUB_ENV
-          echo "SERVICE_PORT=${{ matrix.service == 'backend' && '80' || '3000' }}" >> $GITHUB_ENV
-          echo "DOCKERFILE_PATH=docker/${{ matrix.service == 'backend' && 'fastapi' || 'node' }}/Dockerfile" >> $GITHUB_ENV
+          if [ "${{ matrix.service }}" = "backend" ]; then
+            echo "SERVICE_PORT=80" >> $GITHUB_ENV
+            echo "DOCKERFILE_PATH=docker/fastapi/Dockerfile" >> $GITHUB_ENV
+          elif [ "${{ matrix.service }}" = "traefik" ]; then
+            echo "SERVICE_PORT=80" >> $GITHUB_ENV
+            echo "DOCKERFILE_PATH=docker/traefik/Dockerfile" >> $GITHUB_ENV
+          else
+            echo "SERVICE_PORT=3000" >> $GITHUB_ENV
+            echo "DOCKERFILE_PATH=docker/node/Dockerfile" >> $GITHUB_ENV
+          fi
       - name: 📄 Prepare deployment configuration
         run: |
           # Create temp directory for processed configs
@@ -121,6 +129,9 @@ jobs:
             export BACKEND_CORS_ORIGINS="${{ secrets.BACKEND_CORS_ORIGINS }}"
             # Replace all placeholders using envsubst
             envsubst '${SERVICE_NAME} ${SERVICE_PORT} ${PROJECT_NAME} ${BACKEND_CORS_ORIGINS}' < aws/temp/deploymentconfig.json > aws/temp/deploymentconfig.tmp
+          elif [ "${{ matrix.service }}" = "traefik" ]; then
+            # Traefik doesn't need environment variables
+            envsubst '${SERVICE_NAME} ${SERVICE_PORT}' < aws/temp/deploymentconfig.json > aws/temp/deploymentconfig.tmp
           else
             export VITE_SHOW_DEV_TOOLS="${{ secrets.VITE_SHOW_DEV_TOOLS || 'false' }}"
             # Replace all placeholders using envsubst
@@ -232,14 +243,22 @@ jobs:
             --arg service_name "${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}" \
             --arg backend_name "${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-backend" \
             --arg frontend_name "${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-frontend" \
+            --arg traefik_name "${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-traefik" \
             --arg project_name "${{ env.PROJECT_NAME }}" \
             --arg cors_origins "${{ secrets.BACKEND_CORS_ORIGINS }}" \
             --arg vite_dev_tools "${{ secrets.VITE_SHOW_DEV_TOOLS || 'false' }}" \
             '{
+              ($traefik_name): {
+                "image": (":" + $service_name + "." + $traefik_name + ".latest"),
+                "ports": {
+                  "80": "HTTP"
+                },
+                "environment": {}
+              },
               ($backend_name): {
                 "image": (":" + $service_name + "." + $backend_name + ".latest"),
                 "ports": {
-                  "80": "HTTP"
+                  "8000": "HTTP"
                 },
                 "environment": {
                   "PROJECT_NAME": $project_name,
@@ -257,18 +276,18 @@ jobs:
               }
             }' > aws/temp/deploymentconfig.json
 
-          # Create public endpoint config (frontend will be public)
+          # Create public endpoint config (traefik will be public)
           jq -n \
-            --arg container_name "${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-frontend" \
+            --arg container_name "${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-traefik" \
             '{
               "containerName": $container_name,
-              "containerPort": 3000,
+              "containerPort": 80,
               "healthCheck": {
                 "healthyThreshold": 2,
                 "unhealthyThreshold": 3,
                 "timeoutSeconds": 10,
                 "intervalSeconds": 60,
-                "path": "/",
+                "path": "/ping",
                 "successCodes": "200-399"
               }
             }' > aws/temp/publicendpoint.json
@@ -286,10 +305,11 @@ jobs:
             --public-endpoint file://aws/temp/publicendpoint.json
       - name: ✅ Deployment completed
         run: |
-          echo "🎉 Successfully deployed backend and frontend containers!"
+          echo "🎉 Successfully deployed all containers!"
           echo "Service: ${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}"
           echo "Region: ${{ env.AWS_REGION }}"
-          echo "Frontend (public): ${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-frontend"
+          echo "Traefik (public): ${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-traefik"
+          echo "Frontend (internal): ${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-frontend"
           echo "Backend (internal): ${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-backend"
 
           # Cleanup temp directory
