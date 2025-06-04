@@ -1,0 +1,12 @@
+{
+	"${SERVICE_NAME}": {
+		"image": ":${SERVICE_NAME}.${SERVICE_NAME}.latest",
+		"ports": {
+			"${SERVICE_PORT}": "HTTP"
+		},
+		"environment": {
+			"PROJECT_NAME": "${PROJECT_NAME}",
+			"BACKEND_CORS_ORIGINS": "${BACKEND_CORS_ORIGINS}"
+		}
+	}
+}

@@ -1,0 +1,12 @@
+{
+	"containerName": "${SERVICE_NAME}",
+	"containerPort": "${SERVICE_PORT}",
+	"healthCheck": {
+		"healthyThreshold": 2,
+		"unhealthyThreshold": 3,
+		"timeoutSeconds": 10,
+		"intervalSeconds": 60,
+		"path": "/",
+		"successCodes": "200-399"
+	}
+}
