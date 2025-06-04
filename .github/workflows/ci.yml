@@ -226,47 +226,52 @@ jobs:
         run: |
           mkdir -p aws/temp
 
-          # Create combined deployment config with both containers
-          cat > aws/temp/deploymentconfig.json << EOF
-          {
-            "${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-backend": {
-              "image": ":${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-backend.${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-backend.latest",
-              "ports": {
-                "80": "HTTP"
+          # Use jq to create proper JSON to avoid escaping issues
+          jq -n \
+            --arg backend_name "${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-backend" \
+            --arg frontend_name "${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-frontend" \
+            --arg project_name "${{ env.PROJECT_NAME }}" \
+            --arg cors_origins "${{ secrets.BACKEND_CORS_ORIGINS }}" \
+            --arg vite_api_url "${{ secrets.VITE_API_URL }}" \
+            --arg vite_dev_tools "${{ secrets.VITE_SHOW_DEV_TOOLS }}" \
+            '{
+              ($backend_name): {
+                "image": (":" + $backend_name + "." + $backend_name + ".latest"),
+                "ports": {
+                  "80": "HTTP"
+                },
+                "environment": {
+                  "PROJECT_NAME": $project_name,
+                  "BACKEND_CORS_ORIGINS": $cors_origins
+                }
               },
-              "environment": {
-                "PROJECT_NAME": "${{ env.PROJECT_NAME }}",
-                "BACKEND_CORS_ORIGINS": "${{ secrets.BACKEND_CORS_ORIGINS }}"
+              ($frontend_name): {
+                "image": (":" + $frontend_name + "." + $frontend_name + ".latest"),
+                "ports": {
+                  "3000": "HTTP"
+                },
+                "environment": {
+                  "VITE_API_URL": $vite_api_url,
+                  "VITE_SHOW_DEV_TOOLS": $vite_dev_tools
+                }
               }
-            },
-            "${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-frontend": {
-              "image": ":${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-frontend.${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-frontend.latest",
-              "ports": {
-                "3000": "HTTP"
-              },
-              "environment": {
-                "VITE_API_URL": "${{ secrets.VITE_API_URL }}",
-                "VITE_SHOW_DEV_TOOLS": "${{ secrets.VITE_SHOW_DEV_TOOLS }}"
-              }
-            }
-          }
-          EOF
+            }' > aws/temp/deploymentconfig.json
 
           # Create public endpoint config (frontend will be public)
-          cat > aws/temp/publicendpoint.json << EOF
-          {
-            "containerName": "${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-frontend",
-            "containerPort": 3000,
-            "healthCheck": {
-              "healthyThreshold": 2,
-              "unhealthyThreshold": 3,
-              "timeoutSeconds": 10,
-              "intervalSeconds": 60,
-              "path": "/",
-              "successCodes": "200-399"
-            }
-          }
-          EOF
+          jq -n \
+            --arg container_name "${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-frontend" \
+            '{
+              "containerName": $container_name,
+              "containerPort": 3000,
+              "healthCheck": {
+                "healthyThreshold": 2,
+                "unhealthyThreshold": 3,
+                "timeoutSeconds": 10,
+                "intervalSeconds": 60,
+                "path": "/",
+                "successCodes": "200-399"
+              }
+            }' > aws/temp/publicendpoint.json
 
       - name: 📄 Verify deployment configs
         run: |
