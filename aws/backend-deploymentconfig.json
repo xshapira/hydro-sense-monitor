@@ -6,7 +6,8 @@
 		},
 		"environment": {
 			"PROJECT_NAME": "${PROJECT_NAME}",
-			"BACKEND_CORS_ORIGINS": "${BACKEND_CORS_ORIGINS}"
+			"BACKEND_CORS_ORIGINS": "${BACKEND_CORS_ORIGINS}",
+			"PORT": "${SERVICE_PORT}"
 		}
 	}
 }

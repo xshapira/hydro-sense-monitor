@@ -14,7 +14,7 @@ http:
     backend-service:
       loadBalancer:
         servers:
-          - url: "http://backend:80"
+          - url: "http://backend:8000"
         healthCheck:
           path: "/healthcheck"
           interval: "30s"

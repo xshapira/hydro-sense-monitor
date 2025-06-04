@@ -102,7 +102,7 @@ jobs:
         run: |
           echo "CONTAINER_NAME=${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-${{ matrix.service }}" >> $GITHUB_ENV
           if [ "${{ matrix.service }}" = "backend" ]; then
-            echo "SERVICE_PORT=80" >> $GITHUB_ENV
+            echo "SERVICE_PORT=8000" >> $GITHUB_ENV
             echo "DOCKERFILE_PATH=docker/fastapi/Dockerfile" >> $GITHUB_ENV
           elif [ "${{ matrix.service }}" = "traefik" ]; then
             echo "SERVICE_PORT=80" >> $GITHUB_ENV

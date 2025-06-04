@@ -14,7 +14,7 @@ http:
     backend-service:
       loadBalancer:
         servers:
-          - url: "http://hydro-sense-monitor-backend:80"
+          - url: "http://hydro-sense-monitor-backend:8000"
         healthCheck:
           path: "/healthcheck"
           interval: "30s"

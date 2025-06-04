@@ -41,4 +41,7 @@ COPY --from=uv /app/backend /app/backend
 ENV PATH="/app/backend/.venv/bin:$PATH"
 ENV PYTHONPATH=/app
 
-CMD ["fastapi", "run", "backend/app/main.py", "--host", "0.0.0.0", "--port", "80"]
+# Set default port
+ENV PORT=8000
+
+CMD ["sh", "-c", "fastapi run backend/app/main.py --host 0.0.0.0 --port $PORT"]
