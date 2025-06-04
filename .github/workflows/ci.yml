@@ -122,10 +122,9 @@ jobs:
             # Replace all placeholders using envsubst
             envsubst '${SERVICE_NAME} ${SERVICE_PORT} ${PROJECT_NAME} ${BACKEND_CORS_ORIGINS}' < aws/temp/deploymentconfig.json > aws/temp/deploymentconfig.tmp
           else
-            export VITE_API_URL="${{ secrets.VITE_API_URL }}"
-            export VITE_SHOW_DEV_TOOLS="${{ secrets.VITE_SHOW_DEV_TOOLS }}"
+            export VITE_SHOW_DEV_TOOLS="${{ secrets.VITE_SHOW_DEV_TOOLS || 'false' }}"
             # Replace all placeholders using envsubst
-            envsubst '${SERVICE_NAME} ${SERVICE_PORT} ${VITE_API_URL} ${VITE_SHOW_DEV_TOOLS}' < aws/temp/deploymentconfig.json > aws/temp/deploymentconfig.tmp
+            envsubst '${SERVICE_NAME} ${SERVICE_PORT} ${VITE_SHOW_DEV_TOOLS}' < aws/temp/deploymentconfig.json > aws/temp/deploymentconfig.tmp
           fi
 
           mv aws/temp/deploymentconfig.tmp aws/temp/deploymentconfig.json
@@ -144,8 +143,7 @@ jobs:
           if [ "${{ matrix.service }}" = "frontend" ]; then
             DOCKER_BUILDKIT=1 docker build \
               -f ${{ env.DOCKERFILE_PATH }} \
-              --build-arg VITE_API_URL="${{ secrets.VITE_API_URL }}" \
-              --build-arg VITE_SHOW_DEV_TOOLS="${{ secrets.VITE_SHOW_DEV_TOOLS }}" \
+              --build-arg VITE_SHOW_DEV_TOOLS="${{ secrets.VITE_SHOW_DEV_TOOLS || 'false' }}" \
               -t ${{ env.CONTAINER_NAME }}:latest .
           else
             DOCKER_BUILDKIT=1 docker build \
@@ -236,8 +234,7 @@ jobs:
             --arg frontend_name "${{ env.AWS_LIGHTSAIL_SERVICE_NAME }}-frontend" \
             --arg project_name "${{ env.PROJECT_NAME }}" \
             --arg cors_origins "${{ secrets.BACKEND_CORS_ORIGINS }}" \
-            --arg vite_api_url "${{ secrets.VITE_API_URL }}" \
-            --arg vite_dev_tools "${{ secrets.VITE_SHOW_DEV_TOOLS }}" \
+            --arg vite_dev_tools "${{ secrets.VITE_SHOW_DEV_TOOLS || 'false' }}" \
             '{
               ($backend_name): {
                 "image": (":" + $service_name + "." + $backend_name + ".latest"),
@@ -255,7 +252,6 @@ jobs:
                   "3000": "HTTP"
                 },
                 "environment": {
-                  "VITE_API_URL": $vite_api_url,
                   "VITE_SHOW_DEV_TOOLS": $vite_dev_tools
                 }
               }

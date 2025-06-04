@@ -1,8 +1,18 @@
 const getApiBaseUrl = () => {
 	try {
-		return import.meta.env.VITE_API_URL || "http://127.0.0.1:8000/api/v1";
+		// In production, use relative URLs to go through nginx proxy
+		// In development, use the configured API URL or localhost
+		const envUrl = import.meta.env.VITE_API_URL;
+
+		// If no VITE_API_URL is set, use relative URL (production with nginx proxy)
+		if (!envUrl) {
+			return "/api/v1";
+		}
+
+		return envUrl;
 	} catch {
-		return "http://127.0.0.1:8000/api/v1";
+		// Fallback to relative URL
+		return "/api/v1";
 	}
 };
 

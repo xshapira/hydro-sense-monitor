@@ -5,7 +5,6 @@
 			"${SERVICE_PORT}": "HTTP"
 		},
 		"environment": {
-			"VITE_API_URL": "${VITE_API_URL}",
 			"VITE_SHOW_DEV_TOOLS": "${VITE_SHOW_DEV_TOOLS}"
 		}
 	}
