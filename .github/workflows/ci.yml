@@ -113,21 +113,21 @@ jobs:
           cp aws/${{ matrix.service }}-publicendpoint.json aws/temp/publicendpoint.json
 
           # Replace placeholders in deployment config
-          sed -i 's/${SERVICE_NAME}/'${{ env.SERVICE_NAME }}'/g' aws/temp/deploymentconfig.json
-          sed -i 's/${SERVICE_PORT}/'${{ env.SERVICE_PORT }}'/g' aws/temp/deploymentconfig.json
+          sed -i "s/\${SERVICE_NAME}/${{ env.SERVICE_NAME }}/g" aws/temp/deploymentconfig.json
+          sed -i "s/\${SERVICE_PORT}/${{ env.SERVICE_PORT }}/g" aws/temp/deploymentconfig.json
 
           # Replace environment-specific placeholders
           if [ "${{ matrix.service }}" = "backend" ]; then
-            sed -i 's/${PROJECT_NAME}/${{ env.PROJECT_NAME }}/g' aws/temp/deploymentconfig.json
-            sed -i 's/${BACKEND_CORS_ORIGINS}/${{ secrets.BACKEND_CORS_ORIGINS }}/g' aws/temp/deploymentconfig.json
+            sed -i "s/\${PROJECT_NAME}/${{ env.PROJECT_NAME }}/g" aws/temp/deploymentconfig.json
+            sed -i "s|\${BACKEND_CORS_ORIGINS}|${{ secrets.BACKEND_CORS_ORIGINS }}|g" aws/temp/deploymentconfig.json
           else
-            sed -i 's/${VITE_API_URL}/${{ secrets.VITE_API_URL }}/g' aws/temp/deploymentconfig.json
-            sed -i 's/${VITE_SHOW_DEV_TOOLS}/${{ secrets.VITE_SHOW_DEV_TOOLS }}/g' aws/temp/deploymentconfig.json
+            sed -i "s|\${VITE_API_URL}|${{ secrets.VITE_API_URL }}|g" aws/temp/deploymentconfig.json
+            sed -i "s/\${VITE_SHOW_DEV_TOOLS}/${{ secrets.VITE_SHOW_DEV_TOOLS }}/g" aws/temp/deploymentconfig.json
           fi
 
           # Replace placeholders in public endpoint config
-          sed -i 's/${SERVICE_NAME}/'${{ env.SERVICE_NAME }}'/g' aws/temp/publicendpoint.json
-          sed -i 's/${SERVICE_PORT}/'${{ env.SERVICE_PORT }}'/g' aws/temp/publicendpoint.json
+          sed -i "s/\${SERVICE_NAME}/${{ env.SERVICE_NAME }}/g" aws/temp/publicendpoint.json
+          sed -i "s/\${SERVICE_PORT}/${{ env.SERVICE_PORT }}/g" aws/temp/publicendpoint.json
       - name: 📄 Verify deployment configs
         run: |
           echo "=== Deployment Config ==="
@@ -138,7 +138,6 @@ jobs:
         run: |
           DOCKER_BUILDKIT=1 docker build \
             -f ${{ env.DOCKERFILE_PATH }} \
-            --target ${{ matrix.service == 'backend' && 'production' || 'production' }} \
             -t ${{ env.SERVICE_NAME }}:latest .
       - name: 📬 Push container to AWS Lightsail
         run: |
