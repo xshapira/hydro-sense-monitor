@@ -141,9 +141,17 @@ jobs:
           cat aws/temp/publicendpoint.json
       - name: 🐳 Build Docker container
         run: |
-          DOCKER_BUILDKIT=1 docker build \
-            -f ${{ env.DOCKERFILE_PATH }} \
-            -t ${{ env.CONTAINER_NAME }}:latest .
+          if [ "${{ matrix.service }}" = "frontend" ]; then
+            DOCKER_BUILDKIT=1 docker build \
+              -f ${{ env.DOCKERFILE_PATH }} \
+              --build-arg VITE_API_URL="${{ secrets.VITE_API_URL }}" \
+              --build-arg VITE_SHOW_DEV_TOOLS="${{ secrets.VITE_SHOW_DEV_TOOLS }}" \
+              -t ${{ env.CONTAINER_NAME }}:latest .
+          else
+            DOCKER_BUILDKIT=1 docker build \
+              -f ${{ env.DOCKERFILE_PATH }} \
+              -t ${{ env.CONTAINER_NAME }}:latest .
+          fi
       - name: 📬 Push container to AWS Lightsail
         run: |
           aws lightsail push-container-image \

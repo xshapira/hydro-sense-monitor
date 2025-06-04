@@ -27,6 +27,14 @@ COPY frontend/ /app/frontend
 CMD ["pnpm", "react-router", "dev", "--host", "0.0.0.0"]
 
 FROM dev AS build-prod
+# Build-time arguments for Vite environment variables
+ARG VITE_API_URL
+ARG VITE_SHOW_DEV_TOOLS
+
+# Set environment variables for the build
+ENV VITE_API_URL=${VITE_API_URL}
+ENV VITE_SHOW_DEV_TOOLS=${VITE_SHOW_DEV_TOOLS}
+
 RUN pnpm run build
 RUN pnpm prune --prod
 
