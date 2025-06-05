@@ -1,5 +1,6 @@
-from backend.app.api.routes import sensor
 from fastapi import APIRouter
+
+from app.api.routes import sensor
 
 api_router = APIRouter()
 

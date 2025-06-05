@@ -1,8 +1,9 @@
 from datetime import datetime
 
 import pytest
-from backend.app.schemas import SensorDataInput, SensorReadings
 from pydantic import ValidationError
+
+from app.schemas import SensorDataInput, SensorReadings
 
 
 def test_valid_sensor_readings():

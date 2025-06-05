@@ -1,10 +1,11 @@
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
-from backend.app.api.main import api_router
-from backend.app.core.config import config
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.api.main import api_router
+from app.core.config import config
 
 
 @asynccontextmanager
