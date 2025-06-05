@@ -5,6 +5,8 @@ A hydroponic monitoring system that ingests sensor readings, applies intelligent
 ## Live Demo
 
 **Frontend:** [https://hydro-sense-monitor.3jn045m1dbz0y.eu-central-1.cs.amazonlightsail.com/](https://hydro-sense-monitor.3jn045m1dbz0y.eu-central-1.cs.amazonlightsail.com/)
+
+
 **Backend API:** [https://hydro-sense-monitor.3jn045m1dbz0y.eu-central-1.cs.amazonlightsail.com/api/v1](https://hydro-sense-monitor.3jn045m1dbz0y.eu-central-1.cs.amazonlightsail.com/api/v1)
 
 ### Backend API docs
@@ -388,4 +390,6 @@ Begin recovery with `tomato-row-6` unit.
 ```
 
 **After adding 7 healthy readings:** Last 10 have only 3 alerts → 🟡 WARNING
+
+
 **After adding 10 healthy readings:** Last 10 have 0 alerts → 🟢 HEALTHY
