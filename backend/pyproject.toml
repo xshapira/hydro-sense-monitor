@@ -2,7 +2,7 @@
 name = "hydro-sense-monitor-backend"
 version = "0"
 description = "HydroSense Monitor Backend API"
-requires-python = "==3.13.*"
+requires-python = ">=3.13,<3.14"
 dependencies = [
   "fastapi[standard]>=0.115.12",
   "pydantic>=2.11.5",
