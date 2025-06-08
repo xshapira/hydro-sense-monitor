@@ -38,9 +38,27 @@ hydro-sense-monitor/
 
 ## Quick Start
 
+You can run HydroSense Monitor using either Docker Compose or CLI commands for development.
+
+### Option 1: Docker Compose (Recommended)
+
+The easiest way to run the entire stack with a single command:
+
+```bash
+# Start all services (Traefik, Backend, Frontend)
+docker compose up --build
+```
+
+To stop all services:
+```bash
+docker compose down
+```
+
+### Option 2: CLI Development Setup
+
 ### Environment Configuration
 
-#### Backend Environment Variables
+**Backend Environment Variables**
 
 Rename `.example.env` file to `.env` in `backend/` directory and fill in the necessary information:
 
@@ -49,7 +67,7 @@ PROJECT_NAME="HydroSense Monitor API"
 BACKEND_CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173
 ```
 
-#### Frontend Environment Variables
+**Frontend Environment Variables**
 
 Rename `.example.env` file to `.env` in `frontend/` directory and fill in the necessary information:
 
@@ -60,7 +78,7 @@ VITE_SHOW_DEV_TOOLS=true
 
 You can set `VITE_SHOW_DEV_TOOLS=false` to hide development tools (Generate Random Reading)
 
-### Backend (FastAPI)
+#### Backend (FastAPI)
 
 ```bash
 cd backend
@@ -70,7 +88,7 @@ uv run uvicorn backend.app.main:app --reload
 
 Server runs at `http://localhost:8000`
 
-### Frontend (React + TypeScript)
+#### Frontend (React + TypeScript)
 
 ```bash
 cd frontend
