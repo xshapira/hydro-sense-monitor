@@ -6,7 +6,6 @@ A hydroponic monitoring system that ingests sensor readings, applies intelligent
 
 **Frontend:** [https://hydro-sense-monitor.3jn045m1dbz0y.eu-central-1.cs.amazonlightsail.com/](https://hydro-sense-monitor.3jn045m1dbz0y.eu-central-1.cs.amazonlightsail.com/)
 
-
 **Backend API:** [https://hydro-sense-monitor.3jn045m1dbz0y.eu-central-1.cs.amazonlightsail.com/api/v1](https://hydro-sense-monitor.3jn045m1dbz0y.eu-central-1.cs.amazonlightsail.com/api/v1)
 
 ### Backend API docs
@@ -156,7 +155,7 @@ Units are categorized based on recent alert frequency:
 - **Warning**: 1-3 alerts in last 10 readings
 - **Critical**: 4+ alerts in last 10 readings
 
-# Data Storage
+### Data Storage
 
 Uses in-memory storage for simplicity and speed. The data structure uses a list for readings and a dict for quick alert lookups by `unitId`. For production environment, consider:
 
@@ -390,6 +389,5 @@ Begin recovery with `tomato-row-6` unit.
 ```
 
 **After adding 7 healthy readings:** Last 10 have only 3 alerts → 🟡 WARNING
-
 
 **After adding 10 healthy readings:** Last 10 have 0 alerts → 🟢 HEALTHY
