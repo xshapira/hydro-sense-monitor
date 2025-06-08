@@ -6,7 +6,6 @@ A hydroponic monitoring system that ingests sensor readings, applies intelligent
 
 **Frontend:** [https://hydro-sense-monitor.3jn045m1dbz0y.eu-central-1.cs.amazonlightsail.com/](https://hydro-sense-monitor.3jn045m1dbz0y.eu-central-1.cs.amazonlightsail.com/)
 
-
 **Backend API:** [https://hydro-sense-monitor.3jn045m1dbz0y.eu-central-1.cs.amazonlightsail.com/api/v1](https://hydro-sense-monitor.3jn045m1dbz0y.eu-central-1.cs.amazonlightsail.com/api/v1)
 
 ### Backend API docs
@@ -39,7 +38,47 @@ hydro-sense-monitor/
 
 ## Quick Start
 
-### Backend (FastAPI)
+You can run HydroSense Monitor using either Docker Compose or CLI commands for development.
+
+### Option 1: Docker Compose (Recommended)
+
+The easiest way to run the entire stack with a single command:
+
+```bash
+# Start all services (Traefik, Backend, Frontend)
+docker compose up --build
+```
+
+To stop all services:
+```bash
+docker compose down
+```
+
+### Option 2: CLI Development Setup
+
+### Environment Configuration
+
+**Backend Environment Variables**
+
+Rename `.example.env` file to `.env` in `backend/` directory and fill in the necessary information:
+
+```bash
+PROJECT_NAME="HydroSense Monitor API"
+BACKEND_CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173
+```
+
+**Frontend Environment Variables**
+
+Rename `.example.env` file to `.env` in `frontend/` directory and fill in the necessary information:
+
+```bash
+VITE_API_URL=http://127.0.0.1:8000/api/v1
+VITE_SHOW_DEV_TOOLS=true
+```
+
+You can set `VITE_SHOW_DEV_TOOLS=false` to hide development tools (Generate Random Reading)
+
+#### Backend (FastAPI)
 
 ```bash
 cd backend
@@ -49,7 +88,7 @@ uv run uvicorn backend.app.main:app --reload
 
 Server runs at `http://localhost:8000`
 
-### Frontend (React + TypeScript)
+#### Frontend (React + TypeScript)
 
 ```bash
 cd frontend
@@ -156,7 +195,7 @@ Units are categorized based on recent alert frequency:
 - **Warning**: 1-3 alerts in last 10 readings
 - **Critical**: 4+ alerts in last 10 readings
 
-# Data Storage
+### Data Storage
 
 Uses in-memory storage for simplicity and speed. The data structure uses a list for readings and a dict for quick alert lookups by `unitId`. For production environment, consider:
 
@@ -222,30 +261,6 @@ Beyond standard test coverage, two critical production scenarios are covered:
 
    - **Problem**: Invalid JSON from network corruption, client bugs, or malicious requests could crash the system
    - **Solution**: Robust error handling with appropriate HTTP status codes and descriptive error messages without exposing internal details
-
-
-## Environment Configuration
-
-### Backend Environment Variables
-
-Create `.env` in `backend/` directory:
-
-```bash
-PROJECT_NAME="HydroSense Monitor API"
-BACKEND_CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173
-```
-
-### Frontend Environment Variables
-
-Create `.env` in `frontend/` directory:
-
-```bash
-VITE_API_URL=http://127.0.0.1:8000/api/v1
-VITE_SHOW_DEV_TOOLS=true
-```
-
-You can set `VITE_SHOW_DEV_TOOLS=false` to hide development tools (Generate Random Reading)
-
 
 
 ## CI/CD Pipeline
@@ -390,6 +405,5 @@ Begin recovery with `tomato-row-6` unit.
 ```
 
 **After adding 7 healthy readings:** Last 10 have only 3 alerts → 🟡 WARNING
-
 
 **After adding 10 healthy readings:** Last 10 have 0 alerts → 🟢 HEALTHY
