@@ -38,6 +38,28 @@ hydro-sense-monitor/
 
 ## Quick Start
 
+### Environment Configuration
+
+#### Backend Environment Variables
+
+Rename `.example.env` file to `.env` in `backend/` directory and fill in the necessary information:
+
+```bash
+PROJECT_NAME="HydroSense Monitor API"
+BACKEND_CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173
+```
+
+#### Frontend Environment Variables
+
+Rename `.example.env` file to `.env` in `frontend/` directory and fill in the necessary information:
+
+```bash
+VITE_API_URL=http://127.0.0.1:8000/api/v1
+VITE_SHOW_DEV_TOOLS=true
+```
+
+You can set `VITE_SHOW_DEV_TOOLS=false` to hide development tools (Generate Random Reading)
+
 ### Backend (FastAPI)
 
 ```bash
@@ -221,30 +243,6 @@ Beyond standard test coverage, two critical production scenarios are covered:
 
    - **Problem**: Invalid JSON from network corruption, client bugs, or malicious requests could crash the system
    - **Solution**: Robust error handling with appropriate HTTP status codes and descriptive error messages without exposing internal details
-
-
-## Environment Configuration
-
-### Backend Environment Variables
-
-Create `.env` in `backend/` directory:
-
-```bash
-PROJECT_NAME="HydroSense Monitor API"
-BACKEND_CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173
-```
-
-### Frontend Environment Variables
-
-Create `.env` in `frontend/` directory:
-
-```bash
-VITE_API_URL=http://127.0.0.1:8000/api/v1
-VITE_SHOW_DEV_TOOLS=true
-```
-
-You can set `VITE_SHOW_DEV_TOOLS=false` to hide development tools (Generate Random Reading)
-
 
 
 ## CI/CD Pipeline
