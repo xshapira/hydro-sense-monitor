@@ -5,12 +5,11 @@ http:
     frontend-service:
       loadBalancer:
         servers:
-          - url: "http://frontend:3000"
+          - url: "http://frontend:5173"
         healthCheck:
           path: "/"
           interval: "30s"
           timeout: "3s"
-
     backend-service:
       loadBalancer:
         servers:
@@ -19,7 +18,6 @@ http:
           path: "/healthcheck"
           interval: "30s"
           timeout: "3s"
-
   # Define routers (URL routing rules)
   routers:
     # Traefik internal ping - health check
@@ -27,19 +25,16 @@ http:
       rule: "Path(`/ping`)"
       service: "ping@internal"
       priority: 1000
-
     # API routes - send /api requests to backend
     api-router:
       rule: "PathPrefix(`/api`)"
       service: "backend-service"
       priority: 100
-
     # Frontend routes - send everything else to frontend
     frontend-router:
       rule: "PathPrefix(`/`)"
       service: "frontend-service"
       priority: 1
-
     # Enable dashboard access
     dashboard:
       rule: "Host(`traefik.localhost`) || PathPrefix(`/dashboard`)"

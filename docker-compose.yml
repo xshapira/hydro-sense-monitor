@@ -1,0 +1,42 @@
+services:
+  traefik:
+    image: traefik:3.4
+    ports:
+      - "80:80"
+      - "8080:8080"  # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./docker/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - ./docker/traefik/dynamic-local.yml:/etc/traefik/dynamic.yml:ro
+    networks:
+      - hydro-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/fastapi/Dockerfile
+    environment:
+      - PROJECT_NAME=HydroSense Monitor
+      - BACKEND_CORS_ORIGINS=http://localhost
+    ports:
+      - "8000:8000"
+    networks:
+      - hydro-network
+    container_name: hydro-sense-monitor-backend
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/node/Dockerfile
+      target: dev
+    environment:
+      - VITE_API_URL=http://localhost/api/v1
+    ports:
+      - "5173:5173"
+    networks:
+      - hydro-network
+    container_name: hydro-sense-monitor-frontend
+
+networks:
+  hydro-network:
+    driver: bridge
