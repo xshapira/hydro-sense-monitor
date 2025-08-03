@@ -92,8 +92,8 @@ Server runs at `http://localhost:8000`
 
 ```bash
 cd frontend
-pnpm install
-pnpm dev
+bun install
+bun dev
 ```
 
 Frontend available at `http://localhost:5173`
@@ -237,7 +237,7 @@ uv run pytest app/tests/ -v
 
 ```bash
 cd frontend
-pnpm test
+bun test
 ```
 
 **Coverage includes:**

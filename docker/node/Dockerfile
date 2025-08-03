@@ -1,30 +1,25 @@
 FROM node:24.1-slim AS base
 
-# Set up pnpm
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-# Enable Corepack to manage package manager versions (e.g., pnpm)
-# without explicit installation
-RUN corepack enable
-RUN corepack use pnpm@latest
+# Install bun
+COPY --from=oven/bun:1.2-debian /usr/local/bin/bun /bin/
 
 WORKDIR /app/frontend
 
 # Copy only files required to install dependencies
-COPY frontend/package.json frontend/pnpm-lock.yaml /app/frontend/
+COPY frontend/package.json frontend/bun.lock /app/frontend/
 
 FROM base AS dev
 
-# Install dependencies using pnpm
-RUN --mount=type=cache,target=/pnpm/store \
-  --mount=type=bind,source=frontend/pnpm-lock.yaml,target=pnpm-lock.yaml \
+# Install dependencies using bun
+RUN --mount=type=cache,target=/root/.bun/cache \
+  --mount=type=bind,source=frontend/bun.lock,target=bun.lock \
   --mount=type=bind,source=frontend/package.json,target=package.json \
-  pnpm install --frozen-lockfile
+  bun install --frozen-lockfile
 
 # Copy the project into the image
 COPY frontend/ /app/frontend
 
-CMD ["pnpm", "react-router", "dev", "--host", "0.0.0.0"]
+CMD ["bun", "react-router", "dev", "--host", "0.0.0.0"]
 
 FROM dev AS build-prod
 # Build-time arguments for Vite environment variables
@@ -35,8 +30,10 @@ ARG VITE_SHOW_DEV_TOOLS
 ENV VITE_API_URL=${VITE_API_URL}
 ENV VITE_SHOW_DEV_TOOLS=${VITE_SHOW_DEV_TOOLS}
 
-RUN pnpm run build
-RUN pnpm prune --prod
+RUN bun run build
+
+# Bun doesn't have prune, so reinstall with --production
+RUN rm -rf node_modules && bun install --frozen-lockfile --production
 
 FROM base AS production
 
@@ -54,4 +51,4 @@ COPY --chown=node:node --from=build-prod /app/frontend/build /app/frontend/build
 
 WORKDIR /app/frontend
 
-CMD ["pnpm", "start"]
+CMD ["bun", "start"]
