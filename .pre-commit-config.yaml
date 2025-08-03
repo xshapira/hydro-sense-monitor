@@ -16,10 +16,10 @@ repos:
         args: [--fix, --exit-non-zero-on-fix, --fixable=F841]
       - id: ruff-format
   - repo: https://github.com/biomejs/pre-commit
-    rev: "v0.6.1"
+    rev: v2.1.3
     hooks:
       - id: biome-check
-        additional_dependencies: ["@biomejs/biome@1.9.4"]
+        args: [--config-path, ./frontend/biome.jsonc]
 ci:
   autofix_commit_msg: 🎨 [pre-commit.ci] Auto format from pre-commit.com hooks
   autoupdate_commit_msg: ⬆ [pre-commit.ci] pre-commit autoupdate

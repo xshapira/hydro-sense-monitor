@@ -1,58 +1,68 @@
 {
-	"$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-	"vcs": {
-		"enabled": true,
-		"clientKind": "git",
-		"useIgnoreFile": true
-	},
-	"files": {
-		"ignoreUnknown": true,
-		"ignore": ["node_modules/**"]
-	},
-	"organizeImports": {
-		"enabled": true
-	},
-	"formatter": {
-		"indentStyle": "space",
-		"indentWidth": 2,
-		"lineWidth": 100,
-		"ignore": ["pnpm-lock.yaml"]
-	},
-	"linter": {
-		"enabled": true,
-		"rules": {
-			"recommended": false,
-			"style": {
-				"useNodejsImportProtocol": "error",
-				// Enforce separate type imports for type-only imports to avoid bundling unneeded code
-				"useImportType": "error"
-			},
-			"suspicious": {
-				// This one is specific to catch `console.log`. The rest of logs are permitted
-				"noConsoleLog": "warn"
-			},
-			"correctness": {
-				"noUnusedVariables": "error",
-				"noUnusedFunctionParameters": "error",
-				"noUnusedImports": "error"
-			}
-		}
-	},
-	"javascript": {
-		"formatter": {
-			"trailingCommas": "all",
-			"quoteStyle": "single",
-			"semicolons": "always"
-		}
-	},
-	"json": {
-		"parser": {
-			"allowComments": true,
-			"allowTrailingCommas": true
-		},
-		"formatter": {
-			"indentStyle": "space",
-			"trailingCommas": "none"
-		}
-	}
+  "$schema": "https://biomejs.dev/schemas/2.1.3/schema.json",
+  "root": false,
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "style": {
+        "useImportType": "error"
+      },
+      "suspicious": {
+        "noExplicitAny": "off",
+        "noArrayIndexKey": "off"
+        // "noConsole": {
+        //   "level": "warn",
+        //   "options": {
+        //     "allow": ["error", "warn", "info", "debug"]
+        //   }
+        // }
+      },
+      "correctness": {
+        "noUnusedVariables": {
+          "level": "error",
+          "options": {
+            "ignoreRestSiblings": true
+          }
+        },
+        "noUnusedImports": "error"
+      }
+    }
+  },
+  "javascript": {
+    "formatter": {
+      "trailingCommas": "all",
+      "quoteStyle": "double",
+      "semicolons": "asNeeded"
+    }
+  },
+  "json": {
+    "parser": {
+      "allowComments": true,
+      "allowTrailingCommas": true
+    },
+    "formatter": {
+      "enabled": true,
+      "indentStyle": "space",
+      "trailingCommas": "none"
+    }
+  }
 }
